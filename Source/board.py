@@ -1,6 +1,7 @@
 # 0 = empty black rectangle, 1 = dot, 2 = power dot, 3 = vertical line,
-# 4 = horizontal line, 5 = curve to top right, 6 = curve to top left,
-# 7 = curve to bottom left, 8 = curve to bottom right # 9 = ghost gate
+# 4 = horizontal line, 5 = right curve down, 6 = left curve up,
+# 7 = left curve down, 8 = right curve up, # 9 = ghost gate
+
 boards = [
     [6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5],
     [3, 6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 3],
