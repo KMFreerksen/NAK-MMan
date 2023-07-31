@@ -86,6 +86,10 @@ class Player:
             self.new_rect.move_ip(dist, 0)
 
         if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
+            if self.new_rect.x <= 0:
+                self.new_rect.move_ip(SCREEN_WIDTH, 0)
+            if self.new_rect.x >= SCREEN_WIDTH:
+                self.new_rect.move_ip(-SCREEN_WIDTH, 0)
             self.rect = self.new_rect
 
 
