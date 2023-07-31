@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import math
+from enum import Enum
 from board import boards
 
 pygame.init()
@@ -45,7 +46,7 @@ class State(Enum):
 
 class Ghost:
     def __init__(self, x, y):
-        self.image = pygame.image.load('image.png')
+        self.image = pygame.image.load('images/image.png')
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
