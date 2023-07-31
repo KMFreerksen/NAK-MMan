@@ -38,6 +38,11 @@ MAP = [
 ]
 
 
+class State(Enum):
+    START = 1
+    GAME = 2
+    GAMEOVER = 3
+
 class Ghost:
     def __init__(self, x, y):
         self.image = pygame.image.load('image.png')
@@ -121,7 +126,7 @@ class GameController:
         self.clock = pygame.time.Clock()
         self.running = True
         self.start_level = True
-        self.state = "Start"
+        self.state = State.START
         self.level = boards
         self.player = Player(100, 120)
         self.dots = []
@@ -129,7 +134,7 @@ class GameController:
         self.walls = []
 
     def draw_start_menu(self):
-        if self.state == "Start":
+        if self.state == State.START:
             self.screen.fill(BLACK)
             title_font = pygame.font.Font('CrackMan.TTF', 75)
             title = title_font.render('Nak-Man', True, YELLOW)
@@ -141,7 +146,7 @@ class GameController:
             pygame.display.flip()
 
     def draw_game_over_screen(self):
-        if self.state == "Game Over":
+        if self.state == State.GAMEOVER:
             title_font = pygame.font.SysFont('impact', 48)
             title = title_font.render('Game Over', True, YELLOW)
             button_font = pygame.font.SysFont('impact', 32)
@@ -257,13 +262,13 @@ class GameController:
                 elif event.type == CHANGE_DIRECTION_EVENT:
                     for ghost in self.ghosts:
                         ghost.direction = random.choice(['up', 'down', 'left', 'right'])
-            if game.state == "Start":
+            if game.state == State.START:
                 game.draw_start_menu()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
-                    game.state = "Game"
+                    game.state = State.GAME
 
-            if game.state == "Game":
+            if game.state == State.GAME:
 
                 self.screen.blit(self.surface, (0, 0))
                 self.draw_board()
@@ -277,7 +282,7 @@ class GameController:
                         self.dots.remove(dot)
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
-                        self.state = "Game Over"
+                        self.state = State.GAMEOVER
 
                 if self.start_level:
                     self.create_dots()
@@ -299,14 +304,14 @@ class GameController:
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
 
-            if game.state == "Game Over":
+            if game.state == State.GAMEOVER:
                 game.draw_game_over_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
                     self.start_level = True
                     self.dots.clear()
                     self.walls.clear()
-                    self.state = "Start"
+                    self.state = State.START
                 if key[pygame.K_q]:
                     self.running = False
 
