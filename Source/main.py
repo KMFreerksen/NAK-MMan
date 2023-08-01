@@ -46,7 +46,7 @@ class State(Enum):
 
 class Ghost:
     def __init__(self, x, y):
-        self.image = pygame.image.load('images/image.png')
+        self.image = pygame.image.load('source/images/image.png')
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -137,7 +137,7 @@ class GameController:
     def draw_start_menu(self):
         if self.state == State.START:
             self.screen.fill(BLACK)
-            title_font = pygame.font.Font('CrackMan.TTF', 75)
+            title_font = pygame.font.Font('source/CrackMan.TTF', 75)
             title = title_font.render('Nak-Man', True, YELLOW)
             button_font = pygame.font.SysFont('impact', 32)
             start_button = button_font.render('Press Space to Start', True, YELLOW)
