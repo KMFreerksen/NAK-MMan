@@ -5,7 +5,6 @@ import math
 from enum import Enum
 from board import boards
 from sounds import *
-
 pygame.init()
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
@@ -277,6 +276,7 @@ class GameController:
             i += PACMAN_SIZE * 2
 
     def main(self):
+        pygame.mixer.init()
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
