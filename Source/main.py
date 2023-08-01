@@ -44,6 +44,7 @@ class State(Enum):
     GAME = 2
     GAMEOVER = 3
 
+
 class Ghost:
     def __init__(self, x, y):
         self.image = pygame.image.load('images/image.png')
@@ -74,6 +75,7 @@ class Player:
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
         self.radius = PACMAN_SIZE / 2
+        self.starting_pos = (x, y)
 
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
@@ -133,6 +135,7 @@ class GameController:
         self.dots = []
         self.ghosts = [Ghost(290, 290)]
         self.walls = []
+        self.lives = 3
 
     def draw_start_menu(self):
         if self.state == State.START:
@@ -255,6 +258,23 @@ class GameController:
                     pygame.draw.line(self.screen, WHITE, (j * tile_width, i * tile_height + (0.5 * tile_height)),
                                      (j * tile_width + tile_width, i * tile_height + (0.5 * tile_height)), 3)
 
+    def restart_level(self):
+        self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE, PACMAN_SIZE)
+
+    def lose_life(self):
+        if self.lives == 1:
+            self.lives = 0
+            self.state = State.GAMEOVER
+        else:
+            self.lives -= 1
+            self.restart_level()
+
+    def draw_lives(self):
+        i = PACMAN_SIZE/2
+        for life in range(self.lives):
+            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
+            i += PACMAN_SIZE * 2
+
     def main(self):
         while self.running:
             for event in pygame.event.get():
@@ -283,7 +303,7 @@ class GameController:
                         self.dots.remove(dot)
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
-                        self.state = State.GAMEOVER
+                        self.lose_life()
 
                 if self.start_level:
                     self.create_dots()
@@ -297,6 +317,7 @@ class GameController:
                 self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
+                game.draw_lives()
 
                 if not self.dots:
                     print("You win!")
