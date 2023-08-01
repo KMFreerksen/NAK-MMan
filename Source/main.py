@@ -75,6 +75,7 @@ class Player:
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
         self.radius = PACMAN_SIZE / 2
+        self.starting_pos = (x, y)
 
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
@@ -257,11 +258,16 @@ class GameController:
                     pygame.draw.line(self.screen, WHITE, (j * tile_width, i * tile_height + (0.5 * tile_height)),
                                      (j * tile_width + tile_width, i * tile_height + (0.5 * tile_height)), 3)
 
+    def restart_level(self):
+        self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE, PACMAN_SIZE)
+
     def lose_life(self):
         if self.lives == 1:
+            self.lives = 0
             self.state = State.GAMEOVER
         else:
             self.lives -= 1
+            self.restart_level()
 
     def draw_lives(self):
         i = PACMAN_SIZE/2
