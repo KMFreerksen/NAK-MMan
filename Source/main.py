@@ -2,10 +2,8 @@ import pygame
 import sys
 import random
 import math
-from enum import Enum
 from board import boards
 from sounds import *
-
 pygame.init()
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
@@ -40,12 +38,6 @@ MAP = [
 ]
 
 
-class State(Enum):
-    START = 1
-    GAME = 2
-    GAMEOVER = 3
-
-
 class Ghost:
     def __init__(self, x, y):
         self.image = pygame.image.load('images/image.png')
@@ -76,7 +68,6 @@ class Player:
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
         self.radius = PACMAN_SIZE / 2
-        self.starting_pos = (x, y)
 
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
@@ -95,10 +86,6 @@ class Player:
             self.new_rect.move_ip(dist, 0)
 
         if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
-            if self.new_rect.x <= 0:
-                self.new_rect.move_ip(SCREEN_WIDTH, 0)
-            if self.new_rect.x >= SCREEN_WIDTH:
-                self.new_rect.move_ip(-SCREEN_WIDTH, 0)
             self.rect = self.new_rect
 
 
@@ -130,16 +117,15 @@ class GameController:
         self.clock = pygame.time.Clock()
         self.running = True
         self.start_level = True
-        self.state = State.START
+        self.state = "Start"
         self.level = boards
         self.player = Player(100, 120)
         self.dots = []
         self.ghosts = [Ghost(290, 290)]
         self.walls = []
-        self.lives = 3
 
     def draw_start_menu(self):
-        if self.state == State.START:
+        if self.state == "Start":
             self.screen.fill(BLACK)
             title_font = pygame.font.Font('CrackMan.TTF', 75)
             title = title_font.render('Nak-Man', True, YELLOW)
@@ -151,7 +137,7 @@ class GameController:
             pygame.display.flip()
 
     def draw_game_over_screen(self):
-        if self.state == State.GAMEOVER:
+        if self.state == "Game Over":
             title_font = pygame.font.SysFont('impact', 48)
             title = title_font.render('Game Over', True, YELLOW)
             button_font = pygame.font.SysFont('impact', 32)
@@ -259,23 +245,6 @@ class GameController:
                     pygame.draw.line(self.screen, WHITE, (j * tile_width, i * tile_height + (0.5 * tile_height)),
                                      (j * tile_width + tile_width, i * tile_height + (0.5 * tile_height)), 3)
 
-    def restart_level(self):
-        self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE, PACMAN_SIZE)
-
-    def lose_life(self):
-        if self.lives == 1:
-            self.lives = 0
-            self.state = State.GAMEOVER
-        else:
-            self.lives -= 1
-            self.restart_level()
-
-    def draw_lives(self):
-        i = PACMAN_SIZE/2
-        for life in range(self.lives):
-            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
-            i += PACMAN_SIZE * 2
-
     def main(self):
         pygame.mixer.init()
         while self.running:
@@ -285,14 +254,14 @@ class GameController:
                 elif event.type == CHANGE_DIRECTION_EVENT:
                     for ghost in self.ghosts:
                         ghost.direction = random.choice(['up', 'down', 'left', 'right'])
-            if game.state == State.START:
+            if game.state == "Start":
                 game.draw_start_menu()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
-                    game.state = State.GAME
+                    game.state = "Game"
                     play_pacman_intro()
 
-            if game.state == State.GAME:
+            if game.state == "Game":
 
                 self.screen.blit(self.surface, (0, 0))
                 self.draw_board()
@@ -307,7 +276,7 @@ class GameController:
                         play_pacman_eating()  # Play eating sound
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
-                        self.lose_life()
+                        self.state = "Game Over"
                         play_pacman_dies()  # Play pacman dies sound
 
                 if self.start_level:
@@ -322,7 +291,6 @@ class GameController:
                 self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
-                game.draw_lives()
 
                 if not self.dots:
                     print("You win!")
@@ -331,14 +299,14 @@ class GameController:
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
 
-            if game.state == State.GAMEOVER:
+            if game.state == "Game Over":
                 game.draw_game_over_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
                     self.start_level = True
                     self.dots.clear()
                     self.walls.clear()
-                    self.state = State.START
+                    self.state = "Start"
                 if key[pygame.K_q]:
                     self.running = False
 
