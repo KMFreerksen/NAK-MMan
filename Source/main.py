@@ -4,7 +4,9 @@ import random
 import math
 from enum import Enum
 from board import boards
+from sprite import *
 from sounds import *
+
 pygame.init()
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
@@ -84,7 +86,7 @@ class Player:
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
-        dist = 5
+        dist = 3
         self.new_rect = self.rect.copy()
         if key[pygame.K_DOWN]:  # down key
             self.new_rect.move_ip(0, dist)
@@ -287,7 +289,7 @@ class GameController:
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
                     game.state = State.GAME
-                    self.sounds.play_intro()
+                    play_pacman_intro()  # self.sounds.play_intro()
 
             if game.state == State.GAME:
 
@@ -305,7 +307,7 @@ class GameController:
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
                         self.lose_life()
-                        self.sounds.play_pacman_dies()  # Play pacman dies sound
+                        play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
 
                 if self.start_level:
                     self.create_dots()
