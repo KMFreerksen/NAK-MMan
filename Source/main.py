@@ -138,6 +138,7 @@ class GameController:
         self.ghosts = [Ghost(290, 290)]
         self.walls = []
         self.lives = 3
+        self.sounds = Sounds()
 
     def draw_start_menu(self):
         if self.state == State.START:
@@ -286,7 +287,7 @@ class GameController:
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
                     game.state = State.GAME
-                    play_pacman_intro()
+                    self.sounds.play_intro()
 
             if game.state == State.GAME:
 
@@ -300,11 +301,11 @@ class GameController:
                 for dot in self.dots:
                     if self.player.rect.colliderect(dot.rect):
                         self.dots.remove(dot)
-                        play_pacman_eating()  # Play eating sound
+                        self.sounds.play_pacman_eating()  # Play eating sound
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
                         self.lose_life()
-                        play_pacman_dies()  # Play pacman dies sound
+                        self.sounds.play_pacman_dies()  # Play pacman dies sound
 
                 if self.start_level:
                     self.create_dots()
