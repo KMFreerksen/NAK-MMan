@@ -11,6 +11,8 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
 PACMAN_SIZE = 30
 DOT_SIZE = 20
 TILE_SIZE = 50
+TILE_HEIGHT = ((SCREEN_HEIGHT - 50) // 32)
+TILE_WIDTH = (SCREEN_WIDTH // 30)
 GHOST_SIZE = 25
 GHOST_COLOR = (255, 0, 0)
 BLACK = (0, 0, 0)
@@ -171,60 +173,55 @@ class GameController:
         self.walls.append(wall)
 
     def create_dots(self):
-        tile_height = ((SCREEN_HEIGHT - 50) // 32)
-        tile_width = (SCREEN_WIDTH // 30)
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
                 if self.level[i][j] == 1:
                     self.add_dot(
-                        Dot((j * tile_width + (0.5 * tile_width) - 2), (i * tile_height + (0.5 * tile_height) - 2)))
+                        Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
                 if self.level[i][j] == 2:
-                    pygame.draw.circle(self.screen, WHITE, (j * tile_width + (0.5 * tile_width), i * tile_height +
-                                                            (0.5 * tile_height)), 10)
+                    pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
+                                                            (0.5 * TILE_HEIGHT)), 10)
 
     def create_walls(self):
-        tile_height = ((SCREEN_HEIGHT - 50) // 32)
-        tile_width = (SCREEN_WIDTH // 30)
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
                 if self.level[i][j] == 3:
-                    self.add_wall(Tile((j * tile_width + (0.5 * tile_width) - 1.5), (i * tile_height), 3, tile_height))
+                    self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT))
                 if self.level[i][j] == 4:
-                    self.add_wall(Tile((j * tile_width), (i * tile_height + (0.5 * tile_height) - 1.5), tile_width, 3))
+                    self.add_wall(Tile((j * TILE_WIDTH), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH, 3))
                 if self.level[i][j] == 5:
                     self.add_wall(
-                        Tile((j * tile_width - 1.5), (i * tile_height + (0.5 * tile_height) - 1.5), tile_width * 0.6,
+                        Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
                              3))
                     self.add_wall(
-                        Tile((j * tile_width + (0.5 * tile_width) - 1.5), (i * tile_height + (0.5 * tile_height)), 3,
-                             tile_height * 0.7))
+                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
+                             TILE_HEIGHT * 0.7))
                 if self.level[i][j] == 6:
                     self.add_wall(
-                        Tile((j * tile_width + (0.5 * tile_width) - 1.5), (i * tile_height + (0.5 * tile_height)), 3,
-                             tile_height * 0.5))
+                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
+                             TILE_HEIGHT * 0.5))
                     self.add_wall(
-                        Tile((j * tile_width + (0.5 * tile_width) - 1.5), (i * tile_height + (0.5 * tile_height) - 1.5),
-                             tile_height * 0.7, 3))
+                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
+                             TILE_HEIGHT * 0.7, 3))
                 if self.level[i][j] == 7:
                     pygame.draw.arc(self.screen, BLUE,
-                                    [(j * tile_width + (tile_width * 0.5)), (i * tile_height - (0.4 * tile_height)),
-                                     tile_width, tile_height], PI, 3 * PI / 2, 3)
+                                    [(j * TILE_HEIGHT + (TILE_HEIGHT * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
+                                     TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
                     self.add_wall(
-                        Tile((j * tile_width + (0.5 * tile_width) - 1.5), (i * tile_height), 3, tile_height * 0.6))
+                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT * 0.6))
                     self.add_wall(
-                        Tile((j * tile_width + (0.5 * tile_width) - 1.5), (i * tile_height + (0.5 * tile_height) - 1.5),
-                             tile_width * 0.6, 3))
+                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
+                             TILE_WIDTH * 0.6, 3))
                 if self.level[i][j] == 8:
                     self.add_wall(
-                        Tile((j * tile_width - 1.5), (i * tile_height + (0.5 * tile_height) - 1.5), tile_width * 0.6,
+                        Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
                              3))
-                    self.add_wall(Tile((j * tile_width + (0.5 * tile_width) - 1.5), (i * tile_height), 3, tile_height *
+                    self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT *
                                        0.6))
                 if self.level[i][j] == 9:
-                    pygame.draw.line(self.screen, WHITE, (j * tile_width, i * tile_height + (0.5 * tile_height)),
-                                     (j * tile_width + tile_width, i * tile_height + (0.5 * tile_height)), 3)
+                    pass
                 if self.level[i][j] == 10:
-                    self.player = Player(j * tile_width + (tile_width * 0.3), i * tile_height - 6)
+                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
 
     def draw_board(self):
         tile_height = ((SCREEN_HEIGHT - 50) // 32)

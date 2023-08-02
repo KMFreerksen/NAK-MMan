@@ -33,7 +33,7 @@ def play_pacman_extra_life():
 
 
 def play_pacman_eat_fruit():
-    sound_file = "sounds/pacman_eat fruit.wav"
+    sound_file = "sounds/pacman_eatfruit.wav"
     play_sound(sound_file)
 
 
@@ -44,9 +44,9 @@ def play_pacman_dies():  # Working in code
 
 if __name__ == "__main__":
     # Example usage:
-    play_pacman_intro()
-    play_pacman_eating()
-    play_pacman_eat_ghost()
-    play_pacman_extra_life()
+    #play_pacman_intro()
+    #play_pacman_eating()
+    #play_pacman_eat_ghost()
+    #play_pacman_extra_life()
     play_pacman_eat_fruit()
-    play_pacman_dies()
+    #play_pacman_dies()
