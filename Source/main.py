@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import math
+import os
 from enum import Enum
 from board import boards
 from sprite import *
@@ -27,21 +28,8 @@ FRAME_RATE = 30
 CHANGE_DIRECTION_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(CHANGE_DIRECTION_EVENT, 1000)
 
-MAP = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-]
-
+HIGH_SCORE_FILE = "high_score.txt"
+SCORE_FONT = pygame.font.Font(None, 36)
 
 class State(Enum):
     START = 1
@@ -80,7 +68,7 @@ class Player:
         self.new_rect = self.rect
         self.radius = PACMAN_SIZE / 2
         self.starting_pos = (x, y)
-
+        self.score = 0
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
 
@@ -276,6 +264,11 @@ class GameController:
             i += PACMAN_SIZE * 2
 
     def main(self):
+        if os.path.exists(HIGH_SCORE_FILE):
+            with open(HIGH_SCORE_FILE, 'r') as f:
+                high_score = int(f.read())
+        else:
+                high_score = 0 
         pygame.mixer.init()
         while self.running:
             for event in pygame.event.get():
@@ -304,6 +297,9 @@ class GameController:
                     if self.player.rect.colliderect(dot.rect):
                         self.dots.remove(dot)
                         self.sounds.play_pacman_eating()  # Play eating sound
+                        self.player.score += 1  # Increase the score when a dot is eaten
+                        if self.player.score > high_score:
+                            high_score = self.player.score
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
                         self.lose_life()
@@ -326,6 +322,11 @@ class GameController:
                 if not self.dots:
                     print("You win!")
                     self.running = False
+                    
+                score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
+                self.screen.blit(score_text, (10, 10))
+                high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
+                self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
 
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
