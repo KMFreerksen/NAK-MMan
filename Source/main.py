@@ -262,6 +262,11 @@ class GameController:
             i += PACMAN_SIZE * 2
 
     def main(self):
+        if os.path.exists(HIGH_SCORE_FILE):
+            with open(HIGH_SCORE_FILE, 'r') as f:
+                high_score = int(f.read())
+        else:
+                high_score = 0 
         pygame.mixer.init()
         while self.running:
             for event in pygame.event.get():
