@@ -63,12 +63,14 @@ class Ghost:
 
 
 class Player:
-    def __init__(self, x, y):
+    def __init__(self, x, y, starting_lives):
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
         self.radius = PACMAN_SIZE / 2
         self.starting_pos = (x, y)
         self.score = 0
+        self.lives = starting_lives
+
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
 
@@ -123,12 +125,17 @@ class GameController:
         self.start_level = True
         self.state = State.START
         self.level = boards
-        self.player = Player(100, 120)
+        self.player = Player(100, 120, 3)  # Pass the starting number of lives (3 in this case)
+        #self.player = Player(100, 120)
         self.dots = []
         self.ghosts = [Ghost(290, 290)]
         self.walls = []
         self.lives = 3
         self.sounds = Sounds()
+
+        self.player_lives = 3
+
+
 
     def draw_start_menu(self):
         if self.state == State.START:
@@ -249,18 +256,30 @@ class GameController:
     def restart_level(self):
         self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE, PACMAN_SIZE)
 
+   #def lose_life(self):
+   #     if self.lives == 1:
+   #         self.lives = 0
+   #         self.state = State.GAMEOVER
+   #     else:
+   #         self.lives -= 1
+   #         self.restart_level()
     def lose_life(self):
-        if self.lives == 1:
-            self.lives = 0
+        if self.player.lives == 1:
             self.state = State.GAMEOVER
         else:
-            self.lives -= 1
-            self.restart_level()
+            self.player.lives -= 1
+            self.player.restart_level()
 
     def draw_lives(self):
         i = PACMAN_SIZE/2
         for life in range(self.lives):
             pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
+            i += PACMAN_SIZE * 2
+
+    def draw_lives(self):
+        i = PACMAN_SIZE / 2
+        for _ in range(self.player.lives):
+            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE / 2)
             i += PACMAN_SIZE * 2
 
     def main(self):
@@ -300,6 +319,11 @@ class GameController:
                         self.player.score += 1  # Increase the score when a dot is eaten
                         if self.player.score > high_score:
                             high_score = self.player.score
+                        if self.player.score >= 20:
+                            self.player.lives += 1
+                            self.player_lives += 1
+                            self.player.score = 0
+                            self.sounds.play_extra_life()
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
                         self.lose_life()
