@@ -289,6 +289,7 @@ class GameController:
         else:
                 high_score = 0 
         pygame.mixer.init()
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
