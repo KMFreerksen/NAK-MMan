@@ -268,7 +268,7 @@ class GameController:
             self.state = State.GAMEOVER
         else:
             self.player.lives -= 1
-            self.player.restart_level()
+            self.restart_level()
 
     def draw_lives(self):
         i = PACMAN_SIZE/2
