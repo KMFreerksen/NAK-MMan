@@ -29,6 +29,7 @@ pygame.time.set_timer(CHANGE_DIRECTION_EVENT, 1000)
 HIGH_SCORE_FILE = "high_score.txt"
 SCORE_FONT = pygame.font.Font(None, 36)
 
+
 class State(Enum):
     START = 1
     GAME = 2
@@ -99,7 +100,6 @@ class Dot:
         self.y = y
 
     def draw(self, screen):
-        # pygame.draw.rect(screen, (255, 255, 255), self.rect)
         pygame.draw.circle(screen, WHITE, ((self.x + 2), (self.y + 2)), 4)
 
 
@@ -214,36 +214,34 @@ class GameController:
                     self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
 
     def draw_board(self):
-        tile_height = ((SCREEN_HEIGHT - 50) // 32)
-        tile_width = (SCREEN_WIDTH // 30)
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
                 if self.level[i][j] == 2:
-                    pygame.draw.circle(self.screen, WHITE, (j * tile_width + (0.5 * tile_width), i * tile_height +
-                                                            (0.5 * tile_height)), 10)
+                    pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
+                                                            (0.5 * TILE_HEIGHT)), 10)
                 if self.level[i][j] == 3:
-                    pygame.draw.line(self.screen, BLUE, (j * tile_width + (0.5 * tile_width), i * tile_height),
-                                     (j * tile_width + (0.5 * tile_width), i * tile_height + tile_height), 3)
+                    pygame.draw.line(self.screen, BLUE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
+                                     (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 3)
                 if self.level[i][j] == 4:
-                    pygame.draw.line(self.screen, BLUE, (j * tile_width, i * tile_height + (0.5 * tile_height)),
-                                     (j * tile_width + tile_width, i * tile_height + (0.5 * tile_height)), 3)
+                    pygame.draw.line(self.screen, BLUE, (j * TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
+                                     (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
                 if self.level[i][j] == 5:
-                    pygame.draw.arc(self.screen, BLUE, [(j * tile_width - (tile_width * 0.4) - 2), (i * tile_height +
-                                                        (0.5 * tile_height)), tile_width, tile_height], 0, PI / 2, 3)
+                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT +
+                                                        (0.5 * TILE_HEIGHT)), TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 3)
                 if self.level[i][j] == 6:
-                    pygame.draw.arc(self.screen, BLUE, [(j * tile_width + (tile_width * 0.5)), (i * tile_height +
-                                                        (0.5 * tile_height)), tile_width, tile_height], PI / 2, PI, 3)
+                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT +
+                                                        (0.5 * TILE_HEIGHT)), TILE_WIDTH, TILE_HEIGHT], PI / 2, PI, 3)
                 if self.level[i][j] == 7:
                     pygame.draw.arc(self.screen, BLUE,
-                                    [(j * tile_width + (tile_width * 0.5)), (i * tile_height - (0.4 * tile_height)),
-                                     tile_width, tile_height], PI, 3 * PI / 2, 3)
+                                    [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
+                                     TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
                 if self.level[i][j] == 8:
                     pygame.draw.arc(self.screen, BLUE,
-                                    [(j * tile_width - (tile_width * 0.4) - 2), (i * tile_height - (0.4 * tile_height)),
-                                     tile_width, tile_height], 3 * PI / 2, 2 * PI, 3)
+                                    [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
+                                     TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 3)
                 if self.level[i][j] == 9:
-                    pygame.draw.line(self.screen, WHITE, (j * tile_width, i * tile_height + (0.5 * tile_height)),
-                                     (j * tile_width + tile_width, i * tile_height + (0.5 * tile_height)), 3)
+                    pygame.draw.line(self.screen, WHITE, (j * TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
+                                     (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
 
     def restart_level(self):
         self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE,
@@ -268,7 +266,7 @@ class GameController:
             with open(HIGH_SCORE_FILE, 'r') as f:
                 high_score = int(f.read())
         else:
-                high_score = 0 
+            high_score = 0
         pygame.mixer.init()
         while self.running:
             for event in pygame.event.get():
