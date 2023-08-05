@@ -4,7 +4,7 @@ import random
 import math
 import os
 from enum import Enum
-from board import boards
+from board import *
 from sounds import *
 pygame.init()
 
@@ -67,12 +67,13 @@ class Player:
         self.radius = PACMAN_SIZE / 2
         self.starting_pos = (x, y)
         self.score = 0
+
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
-        dist = 5
+        dist = TILE_WIDTH/4
         self.new_rect = self.rect.copy()
         if key[pygame.K_DOWN]:  # down key
             self.new_rect.move_ip(0, dist)
@@ -245,7 +246,8 @@ class GameController:
                                      (j * tile_width + tile_width, i * tile_height + (0.5 * tile_height)), 3)
 
     def restart_level(self):
-        self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE, PACMAN_SIZE)
+        self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE,
+                                       PACMAN_SIZE)
 
     def lose_life(self):
         if self.lives == 1:
@@ -286,7 +288,6 @@ class GameController:
 
                 self.screen.blit(self.surface, (0, 0))
                 self.draw_board()
-
                 self.player.handle_keys(self.walls)
                 for ghost in self.ghosts:
                     ghost.update(self.walls, self.ghosts)
