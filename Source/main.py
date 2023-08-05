@@ -5,7 +5,9 @@ import math
 import os
 from enum import Enum
 from board import *
+from sprite import *
 from sounds import *
+
 pygame.init()
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
@@ -59,19 +61,21 @@ class Ghost:
 
 
 class Player:
-    def __init__(self, x, y):
+    def __init__(self, x, y, starting_lives):
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
         self.radius = PACMAN_SIZE / 2
         self.starting_pos = (x, y)
         self.score = 0
+        self.lives = starting_lives
+
 
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
-        dist = TILE_WIDTH/4
+        dist = 3
         self.new_rect = self.rect.copy()
         if key[pygame.K_DOWN]:  # down key
             self.new_rect.move_ip(0, dist)
@@ -119,12 +123,17 @@ class GameController:
         self.start_level = True
         self.state = State.START
         self.level = boards
-        self.player = Player(100, 120)
+        self.player = Player(100, 120, 3)  # Pass the starting number of lives (3 in this case)
+        #self.player = Player(100, 120)
         self.dots = []
         self.ghosts = [Ghost(290, 290)]
         self.walls = []
         self.lives = 3
         self.sounds = Sounds()
+
+        self.player_lives = 3
+
+
 
     def draw_start_menu(self):
         if self.state == State.START:
@@ -240,18 +249,30 @@ class GameController:
         self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE,
                                        PACMAN_SIZE)
 
+   #def lose_life(self):
+   #     if self.lives == 1:
+   #         self.lives = 0
+   #         self.state = State.GAMEOVER
+   #     else:
+   #         self.lives -= 1
+   #         self.restart_level()
     def lose_life(self):
-        if self.lives == 1:
-            self.lives = 0
+        if self.player.lives == 1:
             self.state = State.GAMEOVER
         else:
-            self.lives -= 1
+            self.player.lives -= 1
             self.restart_level()
 
     def draw_lives(self):
         i = PACMAN_SIZE/2
         for life in range(self.lives):
             pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
+            i += PACMAN_SIZE * 2
+
+    def draw_lives(self):
+        i = PACMAN_SIZE / 2
+        for _ in range(self.player.lives):
+            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE / 2)
             i += PACMAN_SIZE * 2
 
     def main(self):
@@ -261,6 +282,7 @@ class GameController:
         else:
             high_score = 0
         pygame.mixer.init()
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -273,7 +295,7 @@ class GameController:
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
                     game.state = State.GAME
-                    self.sounds.play_intro()
+                    play_pacman_intro()  # self.sounds.play_intro()
 
             if game.state == State.GAME:
 
@@ -290,10 +312,15 @@ class GameController:
                         self.player.score += 1  # Increase the score when a dot is eaten
                         if self.player.score > high_score:
                             high_score = self.player.score
+                        if self.player.score >= 20:
+                            self.player.lives += 1
+                            self.player_lives += 1
+                            self.player.score = 0
+                            self.sounds.play_extra_life()
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
                         self.lose_life()
-                        self.sounds.play_pacman_dies()  # Play pacman dies sound
+                        play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
 
                 if self.start_level:
                     self.create_map_objects()

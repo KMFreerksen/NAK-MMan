@@ -28,6 +28,7 @@ class Sounds:
     def play_pacman_dies(self):
         pygame.mixer.Sound.play(self.pacman_dies)
 
+
 def play_sound(sound_file):
     pygame.mixer.init()
     try:
