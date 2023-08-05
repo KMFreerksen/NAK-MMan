@@ -31,6 +31,7 @@ pygame.time.set_timer(CHANGE_DIRECTION_EVENT, 1000)
 HIGH_SCORE_FILE = "high_score.txt"
 SCORE_FONT = pygame.font.Font(None, 36)
 
+
 class State(Enum):
     START = 1
     GAME = 2
@@ -39,7 +40,7 @@ class State(Enum):
 
 class Ghost:
     def __init__(self, x, y):
-        self.image = pygame.image.load('images/image.png')
+        self.image = pygame.image.load('images/apple.png')
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -132,10 +133,7 @@ class GameController:
         self.walls = []
         self.lives = 3
         self.sounds = Sounds()
-
         self.player_lives = 3
-
-
 
     def draw_start_menu(self):
         if self.state == State.START:
@@ -276,7 +274,7 @@ class GameController:
             pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
             i += PACMAN_SIZE * 2
 
-    def draw_lives(self):
+    def extra_lives(self):
         i = PACMAN_SIZE / 2
         for _ in range(self.player.lives):
             pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE / 2)
@@ -320,10 +318,10 @@ class GameController:
                         self.player.score += 1  # Increase the score when a dot is eaten
                         if self.player.score > high_score:
                             high_score = self.player.score
-                        if self.player.score >= 20:
+                        if self.player.score >= 20 and self.player.score % 20 == 0:
                             self.player.lives += 1
                             self.player_lives += 1
-                            self.player.score = 0
+                            # self.player.score = 0
                             self.sounds.play_extra_life()
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
@@ -342,7 +340,7 @@ class GameController:
                 self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
-                game.draw_lives()
+                game.extra_lives()
 
                 if not self.dots:
                     print("You win!")
