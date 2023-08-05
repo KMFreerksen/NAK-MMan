@@ -162,7 +162,7 @@ class GameController:
     def add_wall(self, wall):
         self.walls.append(wall)
 
-    def create_dots(self):
+    def create_map_objects(self):
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
                 if self.level[i][j] == 1:
@@ -171,10 +171,6 @@ class GameController:
                 if self.level[i][j] == 2:
                     pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
                                                             (0.5 * TILE_HEIGHT)), 10)
-
-    def create_walls(self):
-        for i in range(len(self.level)):
-            for j in range(len(self.level[i])):
                 if self.level[i][j] == 3:
                     self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT))
                 if self.level[i][j] == 4:
@@ -303,8 +299,7 @@ class GameController:
                         self.sounds.play_pacman_dies()  # Play pacman dies sound
 
                 if self.start_level:
-                    self.create_dots()
-                    self.create_walls()
+                    self.create_map_objects()
                     self.start_level = False
 
                 #for tile in self.walls:
