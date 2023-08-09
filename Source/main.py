@@ -244,12 +244,6 @@ class GameController:
                 if self.level[i][j] == 9:
                     pygame.draw.line(self.screen, WHITE, (j * TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
                                      (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
-                if self.level[i][j] == 10:
-                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                                    tile_width, tile_height], PI, 2 * PI, 3)
-                if self.level[i][j] == 11:
-                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT + (0.6 * TILE_HEIGHT)),
-                                                    TILE_WIDTH, TILE_HEIGHT], 0, PI, 3)
 
     def restart_level(self):
         self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE,
