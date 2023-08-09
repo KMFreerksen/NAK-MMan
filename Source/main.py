@@ -296,7 +296,7 @@ class GameController:
             pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
             i += PACMAN_SIZE * 2
 
-    def draw_lives(self):
+    def extra_lives(self):
         i = PACMAN_SIZE / 2
         for _ in range(self.player.lives):
             pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE / 2)
@@ -342,10 +342,10 @@ class GameController:
                         self.player.score += 1  # Increase the score when a dot is eaten
                         if self.player.score > high_score:
                             high_score = self.player.score
-                        if self.player.score >= 20:
+                        if self.player.score >= 20 and self.player.score % 20 == 0:
                             self.player.lives += 1
                             self.player_lives += 1
-                            self.player.score = 0
+                            # self.player.score = 0
                             self.sounds.play_extra_life()
                 for ghost in self.ghosts:
                     if self.player.rect.colliderect(ghost.rect):
@@ -363,7 +363,7 @@ class GameController:
                 self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
-                game.draw_lives()
+                game.extra_lives()
 
                 if not self.dots:
                     print("You win!")
