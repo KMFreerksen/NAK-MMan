@@ -10,7 +10,7 @@ from sounds import *
 
 pygame.init()
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 850
 PACMAN_SIZE = 30
 DOT_SIZE = 20
 TILE_HEIGHT = ((SCREEN_HEIGHT - 50) // 34)
@@ -37,7 +37,7 @@ class State(Enum):
 
 class Ghost:
     def __init__(self, x, y):
-        self.image = pygame.image.load('images/apple.png')
+        self.image = pygame.image.load('images/image.png')
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -68,7 +68,6 @@ class Player:
         self.starting_pos = (x, y)
         self.score = 0
         self.lives = starting_lives
-
 
     def draw(self, screen):
         pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
@@ -126,7 +125,7 @@ class GameController:
         self.player = Player(100, 120, 3)  # Pass the starting number of lives (3 in this case)
         #self.player = Player(100, 120)
         self.dots = []
-        self.ghosts = [Ghost(290, 290)]
+        self.ghosts = [Ghost(295, 265)]
         self.walls = []
         self.lives = 3
         self.sounds = Sounds()
@@ -210,7 +209,7 @@ class GameController:
                 if self.level[i][j] == 9:
                     pass
                 if self.level[i][j] == 10:
-                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
+                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6, 3)
 
     def draw_board(self):
         for i in range(len(self.level)):
