@@ -39,7 +39,7 @@ class State(Enum):
 
 class Ghost:
     def __init__(self, x, y):
-        self.image = pygame.image.load('images/Nick.jpg')
+        self.image =pygame.transform.scale(pygame.image.load('images/Nick.jpg'),(50,50))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
