@@ -39,7 +39,7 @@ class State(Enum):
 
 class Ghost:
     def __init__(self, x, y):
-        self.image = pygame.image.load('images/image.png')
+        self.image = pygame.image.load('images/Nick.jpg')
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -66,7 +66,6 @@ class Player:
     def __init__(self, x, y, starting_lives):
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
-        #self.radius = PACMAN_SIZE / 2
         self.starting_pos = (x, y)
         self.score = 0
         self.lives = starting_lives
@@ -78,9 +77,6 @@ class Player:
         for i in range(1, 4):
             self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (30, 30)))
 
-
-    #def draw(self, screen):
-        #pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
