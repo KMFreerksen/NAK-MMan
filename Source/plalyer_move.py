@@ -105,39 +105,30 @@ class Player:
         if key[pygame.K_DOWN]:  # down key
             self.new_rect.move_ip(0, dist)
             ##
-            #self.y += PLAYER_SPEED
             self.direction = 3
             ##
         elif key[pygame.K_UP]:  # up key
             self.new_rect.move_ip(0, -dist)
             ##
-            #self.y -= PLAYER_SPEED
             self.direction = 1
             ##
         elif key[pygame.K_LEFT]:  # left key
             self.new_rect.move_ip(-dist, 0)
             ##
-            #self.x -= PLAYER_SPEED
             self.direction = 2
             ##
         elif key[pygame.K_RIGHT]:  # right key
             self.new_rect.move_ip(dist, 0)
             ##
-            #self.x += PLAYER_SPEED
             self.direction = 0
             ##
 
         if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
             if self.new_rect.x <= 0:
-            #if self.x <= 0:
                 self.new_rect.move_ip(SCREEN_WIDTH, 0)
-                #self.x = SCREEN_WIDTH
             if self.new_rect.x >= SCREEN_WIDTH:
-            #if self.x >= SCREEN_WIDTH:
                 self.new_rect.move_ip(-SCREEN_WIDTH, 0)
-                #self.x = -SCREEN_WIDTH
             self.rect = self.new_rect
-            #self.rect = self.x
 
 
 
