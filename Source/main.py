@@ -21,6 +21,8 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 PI = math.pi
 FRAME_RATE = 30
+PACKMAN_IMG_CYCLE = 0
+PLAYER_SPEED = 5
 
 CHANGE_DIRECTION_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(CHANGE_DIRECTION_EVENT, 1000)
@@ -38,9 +40,9 @@ class State(Enum):
 
 
 class Ghost:
-    def __init__(self, x, y, Color):
-        self.image = pygame.image.load(f'source/images/ghost_{Color}.png')
-        self.image = pygame.transform.scale(self.image,(34,30))
+
+    def __init__(self, x, y):
+        self.image =pygame.transform.scale(pygame.image.load('images/Nick.jpg'),(34,30))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -73,14 +75,19 @@ class Player:
     def __init__(self, x, y, starting_lives):
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
-        self.radius = PACMAN_SIZE / 2
         self.starting_pos = (x, y)
         self.score = 0
         self.lives = starting_lives
 
+        self.x = x
+        self.y = y
+        self.player_img = []
+        self.packman_img_cycle = PACKMAN_IMG_CYCLE
+        self.direction = 0
+        for i in range(1, 4):
+            self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (30, 30)))
 
-    def draw(self, screen):
-        pygame.draw.circle(screen, YELLOW, ((self.rect.x + self.radius), (self.rect.y + self.radius)), self.radius)
+
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
@@ -88,12 +95,16 @@ class Player:
         self.new_rect = self.rect.copy()
         if key[pygame.K_DOWN]:  # down key
             self.new_rect.move_ip(0, dist)
+            self.direction = 3
         elif key[pygame.K_UP]:  # up key
             self.new_rect.move_ip(0, -dist)
+            self.direction = 1
         elif key[pygame.K_LEFT]:  # left key
             self.new_rect.move_ip(-dist, 0)
+            self.direction = 2
         elif key[pygame.K_RIGHT]:  # right key
             self.new_rect.move_ip(dist, 0)
+            self.direction = 0
 
         if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
             if self.new_rect.x <= 0:
@@ -101,7 +112,21 @@ class Player:
             if self.new_rect.x >= SCREEN_WIDTH:
                 self.new_rect.move_ip(-SCREEN_WIDTH, 0)
             self.rect = self.new_rect
-
+   
+    def draw(self, screen):
+        self.screen = screen
+        # direction definition: 0: right, 1: up, 2: left, 3: down
+        if self.direction == 0:
+            self.screen.blit(self.player_img[self.packman_img_cycle // 4], [self.rect.x, self.rect.y])
+        if self.direction == 1:
+            self.screen.blit(pygame.transform.rotate(self.player_img[self.packman_img_cycle // 4], 90),
+                                 [self.rect.x, self.rect.y])
+        if self.direction == 2:
+            self.screen.blit(pygame.transform.flip(self.player_img[self.packman_img_cycle // 4], True, False),
+                                 [self.rect.x, self.rect.y])
+        if self.direction == 3:
+            self.screen.blit(pygame.transform.rotate(self.player_img[self.packman_img_cycle // 4], -90),
+                                 [self.rect.x, self.rect.y])
 
 class Dot:
     def __init__(self, x, y):
@@ -147,7 +172,7 @@ class GameController:
     def draw_start_menu(self):
         if self.state == State.START:
             self.screen.fill(BLACK)
-            title_font = pygame.font.Font('source/CrackMan.TTF', 75)
+            title_font = pygame.font.Font('CrackMan.TTF', 75)
             title = title_font.render('Nak-Man', True, YELLOW)
             button_font = pygame.font.SysFont('impact', 32)
             start_button = button_font.render('Press Space to Start', True, YELLOW)
@@ -222,7 +247,9 @@ class GameController:
                 if self.level[i][j] == 9:
                     pass
                 if self.level[i][j] == 10:
-                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6,4)
+
+                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6, 3)
+
 
     def draw_board(self):
         for i in range(len(self.level)):
@@ -291,8 +318,13 @@ class GameController:
         else:
             high_score = 0
         pygame.mixer.init()
+
         flag=1
+
         while self.running:
+
+            self.player.packman_img_cycle = self.player.packman_img_cycle + 1 if self.player.packman_img_cycle < 11 else 0
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -304,7 +336,9 @@ class GameController:
                 game.draw_start_menu()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
+
                     game.state = State.PREGAME
+
                     play_pacman_intro()  # self.sounds.play_intro()
 
             if game.state == State.PREGAME:
@@ -392,7 +426,6 @@ class GameController:
                 self.screen.blit(score_text, (10, 10))
                 high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
                 self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
-
 
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
