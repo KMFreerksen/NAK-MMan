@@ -76,7 +76,7 @@ class Player:
         self.packman_img_cycle = PACKMAN_IMG_CYCLE
         self.direction = 0
         for i in range(1, 4):
-            self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (30, 30)))
+            self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (34, 34)))
 
 
     #def draw(self, screen):
@@ -159,8 +159,6 @@ class GameController:
         self.sounds = Sounds()
 
         self.player_lives = 3
-
-
 
     def draw_start_menu(self):
         if self.state == State.START:
