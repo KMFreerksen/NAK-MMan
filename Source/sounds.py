@@ -3,12 +3,12 @@ import pygame
 
 class Sounds:
     def __init__(self):
-        self.intro = pygame.mixer.Sound("sounds/pacman_beginning.wav")
-        self.chomp = pygame.mixer.Sound("sounds/pacman_chomp.wav")
-        self.eat_ghost = pygame.mixer.Sound("sounds/pacman_eatghost.wav")
-        self.extra_life = pygame.mixer.Sound("sounds/pacman_extrapac.wav")
-        self.eat_fruit = pygame.mixer.Sound("sounds/pacman_eatfruit.wav")
-        self.pacman_dies = pygame.mixer.Sound("sounds/pacman_death.wav")
+        self.intro = pygame.mixer.Sound("source/sounds/pacman_beginning.wav")
+        self.chomp = pygame.mixer.Sound("source/sounds/pacman_chomp.wav")
+        self.eat_ghost = pygame.mixer.Sound("source/sounds/pacman_eatghost.wav")
+        self.extra_life = pygame.mixer.Sound("source/sounds/pacman_extrapac.wav")
+        self.eat_fruit = pygame.mixer.Sound("source/sounds/pacman_eatfruit.wav")
+        self.pacman_dies = pygame.mixer.Sound("source/sounds/pacman_death.wav")
 
     def play_intro(self):
         pygame.mixer.Sound.play(self.intro)
