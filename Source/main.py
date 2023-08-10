@@ -284,26 +284,26 @@ class GameController:
                 # So the 'COHORT' is a different color (BLUE)
                 if self.level[i][j] == 10:
                     pygame.draw.line(self.screen, BLUE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
-                                 (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 3)
+                                 (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 5)
                 if self.level[i][j] == 11:
                     pygame.draw.line(self.screen, BLUE, (j * TILE_HEIGHT, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
-                                 (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
+                                 (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 5)
                 if self.level[i][j] == 12:
                     pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT +
                                                                                                 (0.5 * TILE_HEIGHT)),
-                                                    TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 3)
+                                                    TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 5)
                 if self.level[i][j] == 13:
                     pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT +
                                                                                             (0.5 * TILE_HEIGHT)),
-                                                    TILE_WIDTH, TILE_HEIGHT], PI / 2, PI, 3)
+                                                    TILE_WIDTH, TILE_HEIGHT], PI / 2, PI, 5)
                 if self.level[i][j] == 14:
                     pygame.draw.arc(self.screen, BLUE,
                                 [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                 TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
+                                 TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 5)
                 if self.level[i][j] == 15:
                     pygame.draw.arc(self.screen, BLUE,
                                 [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                 TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 3)
+                                 TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 5)
 
 
     def restart_level(self):
