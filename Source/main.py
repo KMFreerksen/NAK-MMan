@@ -7,6 +7,7 @@ from enum import Enum
 from board import boards
 from sprite import *
 from sounds import *
+from itertools import combinations
 
 pygame.init()
 vec = pygame.math.Vector2
@@ -81,6 +82,18 @@ class Ghost(pygame.sprite.Sprite):
             self.dirvec = vec(0, 0)
             self.between_tiles = False
             self.direction = random.choice(['up', 'down', 'left', 'right'])
+        for ghost1, ghost2 in combinations(ghosts, 2):
+            if ghost1.rect.colliderect(ghost2.rect):
+                ghost1.pos = ghost1.last_pos
+                ghost1.next_pos = ghost1.last_pos
+                ghost1.dirvec = vec(0, 0)
+                ghost1.between_tiles = False
+                ghost1.direction = random.choice(['up', 'down', 'left', 'right'])
+                ghost2.pos = ghost2.last_pos
+                ghost2.next_pos = ghost2.last_pos
+                ghost2.dirvec = vec(0, 0)
+                ghost2.between_tiles = False
+                ghost2.direction = random.choice(['up', 'down', 'left', 'right'])
         self.rect.topleft = self.pos
 
     def handle_direction(self):
@@ -505,7 +518,7 @@ class GameController:
                     self.start_level = False
                 # self.player.handle_keys()
 
-                self.ghost_sprites.update(dt, self.obstacles, self.ghosts)
+                self.ghost_sprites.update(dt, self.obstacles, self.ghost_sprites)
                 self.player.update(dt, self.obstacles)
                 for sprite in self.all_sprites:
                     self.screen.blit(sprite.image, sprite.rect)
