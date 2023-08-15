@@ -76,6 +76,7 @@ class Player:
     def __init__(self, x, y):
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
         self.new_rect = self.rect
+
         self.starting_pos = (x, y)
         self.score = 0
         self.lives = 3
@@ -86,9 +87,7 @@ class Player:
         self.packman_img_cycle = PACKMAN_IMG_CYCLE
         self.direction = 0
         for i in range(1, 4):
-            self.player_img.append(pygame.transform.scale(pygame.image.load(f'source/images/{i}.png'), (30, 30)))
-
-
+            self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (30, 30)))
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
@@ -248,7 +247,7 @@ class GameController:
                 if self.level[i][j] == 9:
                     pass
                 if self.level[i][j] == 10:
-                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
+                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6, 3)
 
 
 
