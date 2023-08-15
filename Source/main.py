@@ -4,7 +4,7 @@ import random
 import math
 import os
 from enum import Enum
-from board import *
+from board import boards
 from sprite import *
 from sounds import *
 
@@ -36,14 +36,14 @@ class State(Enum):
     START = 1
     GAME = 2
     GAMEOVER = 3
-    
     PREGAME = 4
+
 
 
 class Ghost:
 
     def __init__(self, x, y, color):
-        self.image =pygame.transform.scale(pygame.image.load(f'source/images/ghost_{color}'),(34,30))
+        self.image = pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'), (34, 30))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -52,8 +52,8 @@ class Ghost:
         screen.blit(self.image, self.rect)
 
     def update(self, tiles, ghosts):
-        flag=1
-        while(flag):
+        flag = 1
+        while flag:
             self.new_rect = self.rect.copy()
             if self.direction == 'up':
                 self.new_rect.move_ip(0, -5)
@@ -65,9 +65,10 @@ class Ghost:
                 self.new_rect.move_ip(5, 0)
             if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
                 self.rect = self.new_rect
-                flag=0
+                flag = 0
             else:
-                self.direction=random.choice(['up', 'down', 'left', 'right'])
+                self.direction = random.choice(['up', 'down', 'left', 'right'])
+
     def out (self, screen):
         self.clock=pygame.time.Clock()
         
@@ -128,6 +129,7 @@ class Player:
             self.screen.blit(pygame.transform.rotate(self.player_img[self.packman_img_cycle // 4], -90),
                                  [self.rect.x, self.rect.y])
 
+
 class Dot:
     def __init__(self, x, y):
         self.rect = pygame.Rect(x, y, DOT_SIZE, DOT_SIZE)
@@ -167,12 +169,10 @@ class GameController:
 
         self.player_lives = 3
 
-
-
     def draw_start_menu(self):
         if self.state == State.START:
             self.screen.fill(BLACK)
-            title_font = pygame.font.Font('source/CrackMan.TTF', 75)
+            title_font = pygame.font.Font('CrackMan.TTF', 75)
             title = title_font.render('Nak-Man', True, YELLOW)
             button_font = pygame.font.SysFont('impact', 32)
             start_button = button_font.render('Press Space to Start', True, YELLOW)
@@ -246,10 +246,8 @@ class GameController:
                                        0.6))
                 if self.level[i][j] == 9:
                     pass
-                if self.level[i][j] == 10:
-                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6, 3)
-
-
+                if self.level[i][j] == 'P':
+                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
 
     def draw_board(self):
         for i in range(len(self.level)):
@@ -304,30 +302,16 @@ class GameController:
                                 [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
                                  TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 5)
 
-
     def restart_level(self):
         self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE,
                                        PACMAN_SIZE)
 
-   #def lose_life(self):
-   #     if self.lives == 1:
-   #         self.lives = 0
-   #         self.state = State.GAMEOVER
-   #     else:
-   #         self.lives -= 1
-   #         self.restart_level()
     def lose_life(self):
         if self.player.lives == 1:
             self.state = State.GAMEOVER
         else:
             self.player.lives -= 1
             self.restart_level()
-
-    def draw_lives(self):
-        i = PACMAN_SIZE/2
-        for life in range(self.lives):
-            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
-            i += PACMAN_SIZE * 2
 
     def draw_lives(self):
         i = PACMAN_SIZE / 2
@@ -343,7 +327,7 @@ class GameController:
             high_score = 0
         pygame.mixer.init()
 
-        flag=1
+        flag = 1
 
         while self.running:
 
@@ -402,7 +386,7 @@ class GameController:
                         ghost.rect.move_ip(0,-5)
                         pygame.display.flip()
                         self.clock.tick(FRAME_RATE)
-                game.state=State.GAME
+                game.state = State.GAME
             if game.state == State.GAME:
 
                 self.screen.blit(self.surface, (0, 0))

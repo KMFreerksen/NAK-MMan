@@ -22,8 +22,8 @@ class Pacman(Characters):
         self.name = name
         self.color = color
         self.images = [
-            pygame.transform.scale(pygame.image.load("source/images/paku.png"), (35, 35)),
-            pygame.transform.scale(pygame.image.load("source/images/man.png"), (35, 35)),
+            pygame.transform.scale(pygame.image.load("images/paku.png"), (35, 35)),
+            pygame.transform.scale(pygame.image.load("images/man.png"), (35, 35)),
         ]
         self.current_image = 0
         self.image = self.images[self.current_image]
@@ -41,7 +41,7 @@ class Blinky(Characters):
         self.name = name
         self.color = color
         self.images = [
-            pygame.transform.scale(pygame.image.load("source/images/ghost_red.png"), (35, 35)),
+            pygame.transform.scale(pygame.image.load("images/ghost_red.png"), (35, 35)),
             # pygame.transform.scale(pygame.image.load("images/ghost.png"), (20, 20))
         ]
         self.current_image = 0
@@ -61,7 +61,7 @@ class Pinky(Characters):
         self.name = name
         self.color = color
         self.images = [
-            pygame.transform.scale(pygame.image.load("source/images/ghost_pink.png"), (35, 35)),
+            pygame.transform.scale(pygame.image.load("images/ghost_pink.png"), (35, 35)),
             # pygame.transform.scale(pygame.image.load("images/ghost.png"), (20, 20))
         ]
         self.current_image = 0
@@ -80,7 +80,7 @@ class Inky(Characters):
         self.name = name
         self.color = color
         self.images = [
-            pygame.transform.scale(pygame.image.load("source/images/ghost_blue.png"), (35, 35)),
+            pygame.transform.scale(pygame.image.load("images/ghost_blue.png"), (35, 35)),
             # pygame.transform.scale(pygame.image.load("images/ghost.png"), (20, 20))
         ]
         self.current_image = 0
@@ -99,7 +99,7 @@ class Clyde(Characters):
         self.name = name
         self.color = color
         self.images = [
-            pygame.transform.scale(pygame.image.load("source/images/ghost_orange.png"), (35, 35)),
+            pygame.transform.scale(pygame.image.load("images/ghost_orange.png"), (35, 35)),
             # pygame.transform.scale(pygame.image.load("images/ghost.png"), (20, 20))
         ]
         self.current_image = 0

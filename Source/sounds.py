@@ -3,12 +3,12 @@ import pygame
 
 class Sounds:
     def __init__(self):
-        self.intro = pygame.mixer.Sound("source/sounds/pacman_beginning.wav")
-        self.chomp = pygame.mixer.Sound("source/sounds/pacman_chomp.wav")
-        self.eat_ghost = pygame.mixer.Sound("source/sounds/pacman_eatghost.wav")
-        self.extra_life = pygame.mixer.Sound("source/sounds/pacman_extrapac.wav")
-        self.eat_fruit = pygame.mixer.Sound("source/sounds/pacman_eatfruit.wav")
-        self.pacman_dies = pygame.mixer.Sound("source/sounds/pacman_death.wav")
+        self.intro = pygame.mixer.Sound("sounds/pacman_beginning.wav")
+        self.chomp = pygame.mixer.Sound("sounds/pacman_chomp.wav")
+        self.eat_ghost = pygame.mixer.Sound("sounds/pacman_eatghost.wav")
+        self.extra_life = pygame.mixer.Sound("sounds/pacman_extrapac.wav")
+        self.eat_fruit = pygame.mixer.Sound("sounds/pacman_eatfruit.wav")
+        self.pacman_dies = pygame.mixer.Sound("sounds/pacman_death.wav")
 
     def play_intro(self):
         pygame.mixer.Sound.play(self.intro)
@@ -41,32 +41,32 @@ def play_sound(sound_file):
 
 
 def play_pacman_intro():  # Working in code
-    sound_file = "sounds/pacman_beginning.wav"
+    sound_file = "pacman_beginning.wav"
     play_sound(sound_file)
 
 
 def play_pacman_eating():  # Working in code
-    sound_file = "sounds/pacman_chomp.wav"
+    sound_file = "pacman_chomp.wav"
     play_sound(sound_file)
 
 
 def play_pacman_eat_ghost():
-    sound_file = "sounds/pacman_eat-ghost.wav"
+    sound_file = "pacman_eat-ghost.wav"
     play_sound(sound_file)
 
 
 def play_pacman_extra_life():
-    sound_file = "sounds/pacman_extract.wav"
+    sound_file = "pacman_extract.wav"
     play_sound(sound_file)
 
 
 def play_pacman_eat_fruit():
-    sound_file = "sounds/pacman_eatfruit.wav"
+    sound_file = "pacman_eatfruit.wav"
     play_sound(sound_file)
 
 
 def play_pacman_dies():  # Working in code
-    sound_file = "sounds/pacman_death.wav"
+    sound_file = "pacman_death.wav"
     play_sound(sound_file)
 
 
