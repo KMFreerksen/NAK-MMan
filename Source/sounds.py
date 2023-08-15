@@ -72,7 +72,9 @@ def play_pacman_dies():  # Working in code
 
 if __name__ == "__main__":
     # Example usage:
-    #play_pacman_intro()
+    pygame.mixer.init()
+    sounds = Sounds()
+    sounds.play_intro()
     #play_pacman_eating()
     #play_pacman_eat_ghost()
     #play_pacman_extra_life()
