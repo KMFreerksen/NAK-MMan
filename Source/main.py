@@ -471,15 +471,14 @@ class GameController:
 
             if game.state == State.PREGAME:
                 self.screen.blit(self.surface, (0, 0))
-                self.draw_board()
-                self.create_sprite_objects()
+
                 if self.start_level:
+                    self.create_sprite_objects()
                     self.create_map_objects()
                     self.create_dots()
                     self.start_level = False
-                for ghoste in self.ghosts:
-                    ghoste.draw(self.screen)
-                    # self.player.draw(self.screen)
+                self.draw_board()
+
                 for dot in self.dots:
                     dot.draw(self.screen)
                 pygame.display.flip()
@@ -507,6 +506,7 @@ class GameController:
                         pygame.display.flip()
                         self.clock.tick(FRAME_RATE)
                 game.state = State.GAME
+
             if game.state == State.GAME:
                 dt = self.clock.tick(FRAME_RATE) / 1000
                 self.screen.blit(self.surface, (0, 0))
@@ -517,7 +517,8 @@ class GameController:
                     self.create_dots()
                     self.start_level = False
                 # self.player.handle_keys()
-
+                for dot in self.dots:
+                    dot.draw(self.screen)
                 self.ghost_sprites.update(dt, self.obstacles, self.ghost_sprites)
                 self.player.update(dt, self.obstacles)
                 for sprite in self.all_sprites:
@@ -544,11 +545,9 @@ class GameController:
 
                 # for tile in self.walls:
                 # tile.draw(self.screen)
-                #for ghost in self.ghosts:
-                    #ghost.draw(self.screen)
+
                 # self.player.draw(self.screen)
-                for dot in self.dots:
-                    dot.draw(self.screen)
+
                 game.draw_lives()
 
                 if not self.dots:
