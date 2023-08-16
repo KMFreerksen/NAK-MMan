@@ -4,7 +4,7 @@ import random
 import math
 import os
 from enum import Enum
-from board import boards
+from board import boards, boards3
 from sprite import *
 from sounds import *
 from itertools import combinations
@@ -14,7 +14,7 @@ vec = pygame.math.Vector2
 TILE_SIZE = 25
 SCREEN_WIDTH, SCREEN_HEIGHT = (TILE_SIZE * 30), (TILE_SIZE * 34 + 80)
 PACMAN_SIZE = 30
-DOT_SIZE = 10
+DOT_SIZE = 8
 TILE_HEIGHT = TILE_SIZE
 TILE_WIDTH = TILE_SIZE
 BLACK = (0, 0, 0)
@@ -28,7 +28,6 @@ PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
 GHOST_SPEED = 10 * TILE_SIZE
 GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'orange.png', 'pink.png']
-EMPTY_GROUP = []
 
 CHANGE_DIRECTION_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(CHANGE_DIRECTION_EVENT, 1000)
@@ -75,7 +74,8 @@ class Ghost(pygame.sprite.Sprite):
                 self.pos = self.next_pos
                 self.dirvec = vec(0, 0)
                 self.between_tiles = False
-        else: self.direction = random.choice(['up', 'down', 'left', 'right'])
+        else: 
+            self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.rect.topleft = self.pos
         if pygame.sprite.spritecollide(self, walls, False):
             self.pos = self.last_pos
@@ -91,18 +91,18 @@ class Ghost(pygame.sprite.Sprite):
             self.pos = vec(1, self.rect.centery // TILE_SIZE) * TILE_SIZE
             self.dirvec = vec(0, 0)
             self.between_tiles = False
-        for ghost1, ghost2 in combinations(ghosts, 2):
-            if ghost1.rect.colliderect(ghost2.rect):
-                ghost1.pos = ghost1.last_pos
-                ghost1.next_pos = ghost1.last_pos
-                ghost1.dirvec = vec(0, 0)
-                ghost1.between_tiles = False
-                ghost1.direction = random.choice(['up', 'down', 'left', 'right'])
-                ghost2.pos = ghost2.last_pos
-                ghost2.next_pos = ghost2.last_pos
-                ghost2.dirvec = vec(0, 0)
-                ghost2.between_tiles = False
-                ghost2.direction = random.choice(['up', 'down', 'left', 'right'])
+        for ghost01, ghost02 in combinations(ghosts, 2):
+            if ghost01.rect.colliderect(ghost02.rect):
+                ghost01.pos = ghost01.last_pos
+                ghost01.next_pos = ghost01.last_pos
+                ghost01.dirvec = vec(0, 0)
+                ghost01.between_tiles = False
+                ghost01.direction = random.choice(['up', 'down', 'left', 'right'])
+                ghost02.pos = ghost02.last_pos
+                ghost02.next_pos = ghost02.last_pos
+                ghost02.dirvec = vec(0, 0)
+                ghost02.between_tiles = False
+                ghost02.direction = random.choice(['up', 'down', 'left', 'right'])
         self.rect.topleft = self.pos
 
     def handle_direction(self):
@@ -129,7 +129,6 @@ class Ghost(pygame.sprite.Sprite):
                 current_index = self.rect.centerx // TILE_SIZE, self.rect.centery // TILE_SIZE
                 self.last_pos = vec(current_index) * TILE_SIZE
                 self.next_pos = self.last_pos + self.dirvec * TILE_SIZE
-
 
 
 class Player(pygame.sprite.Sprite):
@@ -180,7 +179,6 @@ class Player(pygame.sprite.Sprite):
             self.dirvec = vec(0, 0)
             self.between_tiles = False
         self.rect.topleft = self.pos
-
 
     def handle_keys(self):
         key = pygame.key.get_pressed()
@@ -264,7 +262,7 @@ class GameController:
         self.running = True
         self.start_level = True
         self.state = State.START
-        self.level = boards
+        self.level = boards3
         self.player = Player(100, 120)
         self.dots = []
         self.powerdots = []
@@ -314,59 +312,9 @@ class GameController:
     def add_wall(self, wall):
         self.walls.append(wall)
 
-    def create_map_objects(self):
-        for i in range(len(self.level)):
-            for j in range(len(self.level[i])):
-                # if self.level[i][j] == 1:
-                # self.add_dot(
-                # Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
-                # if self.level[i][j] == 2:
-                # pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
-                # (0.5 * TILE_HEIGHT)), 10)
-                if self.level[i][j] == 3:
-                    self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT))
-                if self.level[i][j] == 4:
-                    self.add_wall(Tile((j * TILE_WIDTH), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH, 3))
-                if self.level[i][j] == 5:
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
-                             3))
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
-                             TILE_HEIGHT * 0.7))
-                if self.level[i][j] == 6:
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
-                             TILE_HEIGHT * 0.5))
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
-                             TILE_HEIGHT * 0.7, 3))
-                if self.level[i][j] == 7:
-                    pygame.draw.arc(self.screen, BLUE,
-                                    [(j * TILE_HEIGHT + (TILE_HEIGHT * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                     TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT * 0.6))
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
-                             TILE_WIDTH * 0.6, 3))
-                if self.level[i][j] == 8:
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
-                             3))
-                    self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT *
-                                       0.6))
-                if self.level[i][j] == 9:
-                    pass
-                # if self.level[i][j] == 'P':
-                # self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
-
     def draw_board(self):
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
-                #if self.level[i][j] == 2:
-                    #pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
-                                                            #(0.5 * TILE_HEIGHT)), 10)
                 if self.level[i][j] == 3:
                     pygame.draw.line(self.screen, RED, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
                                      (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 3)
@@ -400,10 +348,9 @@ class GameController:
                     pygame.draw.line(self.screen, BLUE, (j * TILE_HEIGHT, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
                                      (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 5)
                 if self.level[i][j] == 12:
-                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT +
-                                                                                                    (
-                                                                                                                0.5 * TILE_HEIGHT)),
-                                                        TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 5)
+                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2),
+                                                        (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), TILE_WIDTH,
+                                                        TILE_HEIGHT], 0, PI / 2, 5)
                 if self.level[i][j] == 13:
                     pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT +
                                                                                                 (0.5 * TILE_HEIGHT)),
@@ -432,14 +379,14 @@ class GameController:
     def draw_lives(self):
         i = PACMAN_SIZE / 2
         for _ in range(self.lives):
-            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE / 2)
+            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - 20), PACMAN_SIZE / 2)
             i += PACMAN_SIZE * 2
 
     def create_sprite_objects(self):
         ghost_loc = []
         for row, tiles in enumerate(self.level):
             for col, tile in enumerate(tiles):
-                if tile in [3, 4, 5, 6, 7, 8]:
+                if tile in [3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15]:
                     obstacle = Obstacle(col, row)
                     self.obstacles.add(obstacle)
                     self.all_sprites.add(obstacle)
@@ -476,8 +423,6 @@ class GameController:
         else:
             high_score = 0
         pygame.mixer.init()
-
-        flag = 1
 
         while self.running:
 
@@ -542,7 +487,6 @@ class GameController:
 
                 if self.start_level:
                     self.create_sprite_objects()
-                    self.create_map_objects()
                     self.create_dots()
                     self.start_level = False
                 for dot in self.dots:
@@ -577,7 +521,7 @@ class GameController:
                 for ghost in self.ghost_sprites:
                     if self.player.rect.colliderect(ghost.rect):
                         self.lose_life()
-                        play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
+                        play_pacman_dies()  # Play pacman dies sound
 
                 # for tile in self.walls:
                 # tile.draw(self.screen)
