@@ -160,7 +160,7 @@ class GameController:
         self.player = Player(100, 120)  # Pass the starting number of lives (3 in this case)
         #self.player = Player(100, 120)
         self.dots = []
-        self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'pink.png')]
+        self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'Dawn.jpg')]
         self.walls = []
         self.lives = 3
         self.sounds = Sounds()
