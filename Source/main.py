@@ -83,6 +83,14 @@ class Ghost(pygame.sprite.Sprite):
             self.dirvec = vec(0, 0)
             self.between_tiles = False
             self.direction = random.choice(['up', 'down', 'left', 'right'])
+        if self.rect.topleft[0] <= 0:
+            self.pos = vec(30, self.rect.centery // TILE_SIZE) * TILE_SIZE
+            self.dirvec = vec(0, 0)
+            self.between_tiles = False
+        if self.rect.topleft[0] >= SCREEN_WIDTH:
+            self.pos = vec(1, self.rect.centery // TILE_SIZE) * TILE_SIZE
+            self.dirvec = vec(0, 0)
+            self.between_tiles = False
         for ghost1, ghost2 in combinations(ghosts, 2):
             if ghost1.rect.colliderect(ghost2.rect):
                 ghost1.pos = ghost1.last_pos
@@ -163,7 +171,16 @@ class Player(pygame.sprite.Sprite):
             self.next_pos = self.last_pos
             self.dirvec = vec(0, 0)
             self.between_tiles = False
+        if self.rect.topleft[0] <= 0:
+            self.pos = vec(30, self.rect.centery // TILE_SIZE) * TILE_SIZE
+            self.dirvec = vec(0,0)
+            self.between_tiles = False
+        if self.rect.topleft[0] >= SCREEN_WIDTH:
+            self.pos = vec(1, self.rect.centery // TILE_SIZE) * TILE_SIZE
+            self.dirvec = vec(0, 0)
+            self.between_tiles = False
         self.rect.topleft = self.pos
+
 
     def handle_keys(self):
         key = pygame.key.get_pressed()
