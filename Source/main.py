@@ -12,7 +12,7 @@ from itertools import combinations
 pygame.init()
 vec = pygame.math.Vector2
 TILE_SIZE = 25
-SCREEN_WIDTH, SCREEN_HEIGHT = (TILE_SIZE * 30), (TILE_SIZE * 34 + 80)
+SCREEN_WIDTH, SCREEN_HEIGHT = (TILE_SIZE * 31), (TILE_SIZE * 34 + 80)
 PACMAN_SIZE = 30
 DOT_SIZE = 8
 TILE_HEIGHT = TILE_SIZE
@@ -41,6 +41,7 @@ class State(Enum):
     GAME = 2
     GAMEOVER = 3
     PREGAME = 4
+    WIN = 5
 
 
 class Ghost(pygame.sprite.Sprite):
@@ -276,32 +277,45 @@ class GameController:
         self.lives = 3
 
     def draw_start_menu(self):
-        if self.state == State.START:
-            self.screen.fill(BLACK)
-            title_font = pygame.font.Font('CrackMan.TTF', 75)
-            title = title_font.render('Nak-Man', True, YELLOW)
-            button_font = pygame.font.SysFont('impact', 32)
-            start_button = button_font.render('Press Space to Start', True, YELLOW)
-            self.screen.blit(title, (SCREEN_WIDTH / 2 - title.get_width() / 2, SCREEN_HEIGHT / 4))
-            self.screen.blit(start_button, (
-                SCREEN_WIDTH / 2 - start_button.get_width() / 2, SCREEN_HEIGHT / 2 + start_button.get_height() / 2))
-            pygame.display.flip()
+        self.screen.fill(BLACK)
+        title_font = pygame.font.Font('CrackMan.TTF', 75)
+        title = title_font.render('Nak-Man', True, YELLOW)
+        button_font = pygame.font.SysFont('impact', 32)
+        start_button = button_font.render('Press Space to Start', True, YELLOW)
+        self.screen.blit(title, (SCREEN_WIDTH / 2 - title.get_width() / 2, SCREEN_HEIGHT / 4))
+        self.screen.blit(start_button, (
+            SCREEN_WIDTH / 2 - start_button.get_width() / 2, SCREEN_HEIGHT / 2 + start_button.get_height() / 2))
+        pygame.display.flip()
 
     def draw_game_over_screen(self):
-        if self.state == State.GAMEOVER:
-            title_font = pygame.font.SysFont('impact', 48)
-            title = title_font.render('Game Over', True, YELLOW)
-            button_font = pygame.font.SysFont('impact', 32)
-            restart = button_font.render('P - Play Again', True, YELLOW, BLACK)
-            quit_button = button_font.render('Q - Quit', True, YELLOW, BLACK)
-            self.screen.blit(title,
-                             (SCREEN_WIDTH / 2 - title.get_width() / 2, SCREEN_HEIGHT / 2 - title.get_height() / 2))
-            self.screen.blit(restart, (
-                SCREEN_WIDTH / 2 - restart.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height()))
-            self.screen.blit(quit_button, (
-                SCREEN_WIDTH / 2 - quit_button.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height() +
-                quit_button.get_height()))
-            pygame.display.flip()
+        title_font = pygame.font.SysFont('impact', 48)
+        title = title_font.render('Game Over', True, YELLOW)
+        button_font = pygame.font.SysFont('impact', 32)
+        restart = button_font.render('P - Play Again', True, YELLOW, BLACK)
+        quit_button = button_font.render('Q - Quit', True, YELLOW, BLACK)
+        self.screen.blit(title,
+                         (SCREEN_WIDTH / 2 - title.get_width() / 2, SCREEN_HEIGHT / 2 - title.get_height() / 2))
+        self.screen.blit(restart, (
+            SCREEN_WIDTH / 2 - restart.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height()))
+        self.screen.blit(quit_button, (
+            SCREEN_WIDTH / 2 - quit_button.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height() +
+            quit_button.get_height()))
+        pygame.display.flip()
+
+    def draw_win_screen(self):
+        title_font = pygame.font.SysFont('impact', 48)
+        title = title_font.render('You Win!', True, YELLOW)
+        button_font = pygame.font.SysFont('impact', 32)
+        restart = button_font.render('P - Play Again', True, YELLOW, BLACK)
+        quit_button = button_font.render('Q - Quit', True, YELLOW, BLACK)
+        self.screen.blit(title,
+                         (SCREEN_WIDTH / 2 - title.get_width() / 2, SCREEN_HEIGHT / 2 - title.get_height() / 2))
+        self.screen.blit(restart, (
+            SCREEN_WIDTH / 2 - restart.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height()))
+        self.screen.blit(quit_button, (
+            SCREEN_WIDTH / 2 - quit_button.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height() +
+            quit_button.get_height()))
+        pygame.display.flip()
 
     def add_dot(self, dot):
         self.dots.append(dot)
@@ -529,8 +543,7 @@ class GameController:
                 game.draw_lives()
 
                 if not self.dots:
-                    print("You win!")
-                    self.running = False
+                    self.state = State.WIN
 
                 score_text = SCORE_FONT.render("Score: %d" % self.score, True, (255, 255, 255))
                 self.screen.blit(score_text, (10, 10))
@@ -542,6 +555,21 @@ class GameController:
 
             if game.state == State.GAMEOVER:
                 game.draw_game_over_screen()
+                key = pygame.key.get_pressed()
+                if key[pygame.K_p]:
+                    self.player.kill()
+                    for sprite in self.all_sprites:
+                        sprite.kill()
+                    self.dots.clear()
+                    self.powerdots.clear()
+                    self.start_level = True
+                    self.lives = 3
+                    self.state = State.START
+                if key[pygame.K_q]:
+                    self.running = False
+
+            if game.state == State.WIN:
+                game.draw_win_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
                     self.player.kill()
