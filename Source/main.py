@@ -39,6 +39,7 @@ class State(Enum):
     GAME = 2
     GAMEOVER = 3
     PREGAME = 4
+    WIN = 5
 
 
 class Ghost():
@@ -238,7 +239,7 @@ class GameController:
     def draw_game_over_screen(self):
         if self.state == State.GAMEOVER:
             title_font = pygame.font.SysFont('impact', 48)
-            title = title_font.render('Game Over', True, YELLOW)
+            title = title_font.render('Game Over', True, YELLOW, BLACK)
             button_font = pygame.font.SysFont('impact', 32)
             restart = button_font.render('P - Play Again', True, YELLOW, BLACK)
             quit_button = button_font.render('Q - Quit', True, YELLOW, BLACK)
@@ -249,6 +250,21 @@ class GameController:
                 SCREEN_WIDTH / 2 - quit_button.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height() +
                 quit_button.get_height()))
             pygame.display.flip()
+
+    def draw_win_screen(self):
+        title_font = pygame.font.SysFont('impact', 48)
+        title = title_font.render('You Win!', True, YELLOW, BLACK)
+        button_font = pygame.font.SysFont('impact', 32)
+        restart = button_font.render('P - Play Again', True, YELLOW, BLACK)
+        quit_button = button_font.render('Q - Quit', True, YELLOW, BLACK)
+        self.screen.blit(title,
+                         (SCREEN_WIDTH / 2 - title.get_width() / 2, SCREEN_HEIGHT / 2 - title.get_height() / 2))
+        self.screen.blit(restart, (
+            SCREEN_WIDTH / 2 - restart.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height()))
+        self.screen.blit(quit_button, (
+            SCREEN_WIDTH / 2 - quit_button.get_width() / 2, SCREEN_HEIGHT / 2 + restart.get_height() +
+            quit_button.get_height()))
+        pygame.display.flip()
 
     def add_dot(self, dot):
         self.dots.append(dot)
@@ -459,7 +475,6 @@ class GameController:
                             ghoste.draw(self.screen)
                         for dot in self.dots:
                             dot.draw(self.screen)
-                        game.draw_lives()
 
                         #score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
                         #self.screen.blit(score_text, (10, 10))
@@ -512,10 +527,6 @@ class GameController:
                         else:
                             ghost.die()
 
-                if self.start_level:
-                    self.create_map_objects()
-                    self.start_level = False
-
                 #for tile in self.walls:
                     #tile.draw(self.screen)
                 for ghost in self.ghosts:
@@ -531,8 +542,8 @@ class GameController:
                 game.draw_lives()
 
                 if not self.dots:
-                    print("You win!")
-                    self.running = False
+                    game.state = State.WIN
+
                     
                 score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
                 self.screen.blit(score_text, (10, 10))
@@ -542,6 +553,18 @@ class GameController:
                 frightened_mode_timer-=1
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
+
+            if game.state == State.WIN:
+                game.draw_win_screen()
+                key = pygame.key.get_pressed()
+                if key[pygame.K_p]:
+                    self.player = Player(100, 200)
+                    self.walls.clear()
+                    self.dots.clear()
+                    self.start_level = True
+                    self.state = State.START
+                if key[pygame.K_q]:
+                    self.running = False
 
             if game.state == State.GAMEOVER:
                 game.draw_game_over_screen()
