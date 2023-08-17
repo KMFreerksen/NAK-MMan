@@ -16,6 +16,7 @@ PACMAN_SIZE = 30
 DOT_SIZE = 20
 TILE_HEIGHT = TILE_SIZE
 TILE_WIDTH = TILE_SIZE
+POWER_DOT_SIZE = 30
 BLACK = (0, 0, 0)
 BLUE = (25, 25, 166)
 WHITE = (255, 255, 255)
@@ -43,12 +44,12 @@ class State(Enum):
 class Ghost():
 
     def __init__(self, x, y, color):
-        super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'), (34, 30))
+        self.image =pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(34,30))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
-
+        self.dead_timer = 0
+        self.previous_move=['ss','ss']
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
@@ -64,16 +65,25 @@ class Ghost():
                 self.new_rect.move_ip(-5, 0)
             elif self.direction == 'right':
                 self.new_rect.move_ip(5, 0)
-            if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
+            if (not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall)) and self.direction != self.previous_move[0]:
                 self.rect = self.new_rect
-                flag = 0
+
+                flag=0
+                if self.direction != self.previous_move[1]:
+                    self.previous_move[0]=self.previous_move[1]
+                    self.previous_move[1]=self.direction
             else:
                 self.direction = random.choice(['up', 'down', 'left', 'right'])
 
     def out (self, screen):
         self.clock=pygame.time.Clock()
         
-
+    def die (self):
+        self.x=330
+        self.y=270
+        self.dead_timer=5*FRAME_RATE
+        
+        
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -170,6 +180,14 @@ class Dot:
     def draw(self, screen):
         pygame.draw.circle(screen, WHITE, ((self.x + 2), (self.y + 2)), 4)
 
+class Power_Dot:
+    def __init__(self, x, y):
+        self.rect = pygame.Rect(x, y, POWER_DOT_SIZE, POWER_DOT_SIZE)
+        self.x = x
+        self.y = y
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, WHITE, ((self.x + 5), (self.y + 5)), 10)
 
 class Tile:
     def __init__(self, x, y, w, h, is_wall=True):
@@ -193,8 +211,8 @@ class GameController:
         self.player = Player(100, 120)  # Pass the starting number of lives (3 in this case)
         # self.player = Player(100, 120)
         self.dots = []
-        self.ghosts = [Ghost(330, 330, 'Nick.jpg'), Ghost(330, 330, 'Felipe.jpg'), Ghost(330, 330, 'orange.png'),
-                       Ghost(330, 330, 'pink.png')]
+        self.power_dots = []
+        self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'Dawn.jpg')]
         self.walls = []
         # self.lives = 3
         self.sounds = Sounds()
@@ -234,19 +252,20 @@ class GameController:
 
     def add_dot(self, dot):
         self.dots.append(dot)
-
+    def add_power_dot(self, dot):
+        self.power_dots.append(dot)
     def add_wall(self, wall):
         self.walls.append(wall)
 
     def create_map_objects(self):
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
-                # if self.level[i][j] == 1:
-                    # self.add_dot(
-                        # Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
-                # if self.level[i][j] == 2:
-                   # pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
-                                                           # (0.5 * TILE_HEIGHT)), 10)
+                if self.level[i][j] == 1:
+                    self.add_dot(
+                        Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
+                if self.level[i][j] == 2:
+                    self.add_power_dot(
+                        Power_Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 5)))
                 if self.level[i][j] == 3:
                     self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT))
                 if self.level[i][j] == 4:
@@ -282,15 +301,14 @@ class GameController:
                                        0.6))
                 if self.level[i][j] == 9:
                     pass
-                # if self.level[i][j] == 'P':
-                    # self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
+
 
     def draw_board(self):
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
-                if self.level[i][j] == 2:
-                    pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
-                                                            (0.5 * TILE_HEIGHT)), 10)
+                #if self.level[i][j] == 2:
+                    #pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
+                                                        #    (0.5 * TILE_HEIGHT)), 10)
                 if self.level[i][j] == 3:
                     pygame.draw.line(self.screen, RED, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
                                      (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 3)
@@ -353,7 +371,8 @@ class GameController:
     def draw_lives(self):
         i = PACMAN_SIZE / 2
         for _ in range(self.player.lives):
-            pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE / 2)
+            self.screen.blit(pygame.transform.scale(pygame.image.load('images/1.png'), (PACMAN_SIZE, PACMAN_SIZE)),
+                             (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 1.5 * PACMAN_SIZE))
             i += PACMAN_SIZE * 2
 
     def create_sprite_objects(self):
@@ -385,7 +404,10 @@ class GameController:
             high_score = 0
         pygame.mixer.init()
 
-        flag = 1
+        flag=1
+        frightened_mode=False
+        
+        frightened_mode_timer=0
 
         while self.running:
 
@@ -420,6 +442,8 @@ class GameController:
                     #self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
+                for power_dot in self.power_dots:
+                    power_dot.draw(self.screen)
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
                 game.draw_lives()
@@ -451,11 +475,17 @@ class GameController:
 
                 # self.player.handle_keys()
                 for ghost in self.ghosts:
-                    ghost.update(self.walls, self.ghosts)
-                self.player.update(dt, self.obstacles)
-                for sprite in self.all_sprites:
-                    self.screen.blit(sprite.image, sprite.rect)
-                self.draw_board()
+                    if ghost.dead_timer == 0:
+                        ghost.update(self.walls, self.ghosts)
+                for power_dot in self.power_dots:
+                    if self.player.rect.colliderect(power_dot.rect):   
+                        self.power_dots.remove(power_dot) 
+                        frightened_mode_timer= 20 * FRAME_RATE
+                if frightened_mode_timer > 0:
+                    frightened_mode = True
+                else:
+                    frightened_mode = False
+
                 for dot in self.dots:
                     if self.player.rect.colliderect(dot.rect):
                         self.dots.remove(dot)
@@ -465,11 +495,17 @@ class GameController:
                             high_score = self.player.score
                         if self.player.score >= 20 and self.player.score % 20 == 0:
                             self.player.lives += 1
+
                             self.sounds.play_extra_life()
                 for ghost in self.ghosts:
+                    if ghost.dead_timer>0:
+                        ghost.dead_timer-=1
                     if self.player.rect.colliderect(ghost.rect):
-                        self.lose_life()
-                        play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
+                        if frightened_mode==False:
+                            self.lose_life()
+                            play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
+                        else:
+                            ghost.die()
 
                 if self.start_level:
                     self.create_map_objects()
@@ -478,10 +514,15 @@ class GameController:
                 #for tile in self.walls:
                     #tile.draw(self.screen)
                 for ghost in self.ghosts:
-                    ghost.draw(self.screen)
-                #self.player.draw(self.screen)
+
+                    if ghost.dead_timer==0:
+                        ghost.draw(self.screen)
+                self.player.draw(self.screen)
+
                 for dot in self.dots:
                     dot.draw(self.screen)
+                for power_dot in self.power_dots:
+                    power_dot.draw(self.screen)
                 game.draw_lives()
 
                 if not self.dots:
@@ -493,6 +534,7 @@ class GameController:
                 high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
                 self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
 
+                frightened_mode_timer-=1
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
 
