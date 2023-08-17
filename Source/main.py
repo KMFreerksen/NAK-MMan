@@ -44,7 +44,7 @@ class State(Enum):
 class Ghost:
 
     def __init__(self, x, y, color):
-        self.image =pygame.transform.scale(pygame.image.load(f'Source/images/ghost_{color}'),(34,30))
+        self.image =pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(34,30))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -92,7 +92,9 @@ class Player:
         self.packman_img_cycle = PACKMAN_IMG_CYCLE
         self.direction = 0
         for i in range(1, 4):
-            self.player_img.append(pygame.transform.scale(pygame.image.load(f'Source/images/{i}.png'), (30, 30)))
+
+            self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (30, 30)))
+
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
@@ -173,7 +175,9 @@ class GameController:
         self.player = Player(100, 120)  # Pass the starting number of lives (3 in this case)
         #self.player = Player(100, 120)
         self.dots = []
+
         self.power_dots = []
+
         self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'Dawn.jpg')]
         self.walls = []
         self.lives = 3

@@ -41,7 +41,7 @@ class Blinky(Characters):
         self.name = name
         self.color = color
         self.images = [
-            pygame.transform.scale(pygame.image.load("images/ghost.png"), (35, 35)),
+            pygame.transform.scale(pygame.image.load("images/ghost_red.png"), (35, 35)),
             # pygame.transform.scale(pygame.image.load("images/ghost.png"), (20, 20))
         ]
         self.current_image = 0
