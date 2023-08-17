@@ -49,7 +49,7 @@ class Ghost:
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
         self.dead_timer = 0
-
+        self.previous_move=['ss','ss']
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
@@ -65,9 +65,12 @@ class Ghost:
                 self.new_rect.move_ip(-5, 0)
             elif self.direction == 'right':
                 self.new_rect.move_ip(5, 0)
-            if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
+            if (not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall)) and self.direction != self.previous_move[0]:
                 self.rect = self.new_rect
                 flag=0
+                if self.direction != self.previous_move[1]:
+                    self.previous_move[0]=self.previous_move[1]
+                    self.previous_move[1]=self.direction
             else:
                 self.direction=random.choice(['up', 'down', 'left', 'right'])
     def out (self, screen):
