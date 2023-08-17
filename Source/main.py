@@ -49,7 +49,7 @@ class Ghost:
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
         self.dead_timer = 0
-
+        self.previous_move=['ss','ss']
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
