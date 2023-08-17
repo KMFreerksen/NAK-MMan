@@ -13,6 +13,7 @@ pygame.init()
 SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
 PACMAN_SIZE = 30
 DOT_SIZE = 20
+POWER_DOT_SIZE = 30
 TILE_HEIGHT = ((SCREEN_HEIGHT - 50) // 34)
 TILE_WIDTH = (SCREEN_WIDTH // 30)
 BLACK = (0, 0, 0)
@@ -47,6 +48,7 @@ class Ghost:
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
+        self.dead_timer = 0
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -71,7 +73,10 @@ class Ghost:
     def out (self, screen):
         self.clock=pygame.time.Clock()
         
-
+    def die (self):
+        self.x=330
+        self.y=270
+        self.dead_timer=5*FRAME_RATE
 class Player:
     def __init__(self, x, y):
         self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
@@ -87,7 +92,9 @@ class Player:
         self.packman_img_cycle = PACKMAN_IMG_CYCLE
         self.direction = 0
         for i in range(1, 4):
+
             self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (30, 30)))
+
 
     def handle_keys(self, tiles):
         key = pygame.key.get_pressed()
@@ -137,6 +144,14 @@ class Dot:
     def draw(self, screen):
         pygame.draw.circle(screen, WHITE, ((self.x + 2), (self.y + 2)), 4)
 
+class Power_Dot:
+    def __init__(self, x, y):
+        self.rect = pygame.Rect(x, y, POWER_DOT_SIZE, POWER_DOT_SIZE)
+        self.x = x
+        self.y = y
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, WHITE, ((self.x + 5), (self.y + 5)), 10)
 
 class Tile:
     def __init__(self, x, y, w, h, is_wall=True):
@@ -160,6 +175,9 @@ class GameController:
         self.player = Player(100, 120)  # Pass the starting number of lives (3 in this case)
         #self.player = Player(100, 120)
         self.dots = []
+
+        self.power_dots = []
+
         self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'Dawn.jpg')]
         self.walls = []
         self.lives = 3
@@ -172,7 +190,7 @@ class GameController:
     def draw_start_menu(self):
         if self.state == State.START:
             self.screen.fill(BLACK)
-            title_font = pygame.font.Font('CrackMan.TTF', 75)
+            title_font = pygame.font.Font('Source/CrackMan.TTF', 75)
             title = title_font.render('Nak-Man', True, YELLOW)
             button_font = pygame.font.SysFont('impact', 32)
             start_button = button_font.render('Press Space to Start', True, YELLOW)
@@ -198,7 +216,8 @@ class GameController:
 
     def add_dot(self, dot):
         self.dots.append(dot)
-
+    def add_power_dot(self, dot):
+        self.power_dots.append(dot)
     def add_wall(self, wall):
         self.walls.append(wall)
 
@@ -209,8 +228,8 @@ class GameController:
                     self.add_dot(
                         Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
                 if self.level[i][j] == 2:
-                    pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
-                                                            (0.5 * TILE_HEIGHT)), 10)
+                    self.add_power_dot(
+                        Power_Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 5)))
                 if self.level[i][j] == 3:
                     self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT))
                 if self.level[i][j] == 4:
@@ -254,9 +273,9 @@ class GameController:
     def draw_board(self):
         for i in range(len(self.level)):
             for j in range(len(self.level[i])):
-                if self.level[i][j] == 2:
-                    pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
-                                                            (0.5 * TILE_HEIGHT)), 10)
+                #if self.level[i][j] == 2:
+                    #pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
+                                                        #    (0.5 * TILE_HEIGHT)), 10)
                 if self.level[i][j] == 3:
                     pygame.draw.line(self.screen, RED, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
                                      (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 3)
@@ -344,6 +363,9 @@ class GameController:
         pygame.mixer.init()
 
         flag=1
+        frightened_mode=False
+        
+        frightened_mode_timer=0
 
         while self.running:
 
@@ -376,6 +398,8 @@ class GameController:
                     self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
+                for power_dot in self.power_dots:
+                    power_dot.draw(self.screen)
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
                 game.draw_lives()
@@ -410,7 +434,16 @@ class GameController:
                 self.player.handle_keys(self.walls)
 
                 for ghost in self.ghosts:
-                    ghost.update(self.walls, self.ghosts)
+                    if ghost.dead_timer == 0:
+                        ghost.update(self.walls, self.ghosts)
+                for power_dot in self.power_dots:
+                    if self.player.rect.colliderect(power_dot.rect):   
+                        self.power_dots.remove(power_dot) 
+                        frightened_mode_timer= 20 * FRAME_RATE
+                if frightened_mode_timer > 0:
+                    frightened_mode = True
+                else:
+                    frightened_mode = False
 
                 for dot in self.dots:
                     if self.player.rect.colliderect(dot.rect):
@@ -421,13 +454,17 @@ class GameController:
                             high_score = self.player.score
                         if self.player.score >= 20:
                             self.player.lives += 1
-                            self.player_lives += 1
                             self.player.score = 0
                             self.sounds.play_extra_life()
                 for ghost in self.ghosts:
+                    if ghost.dead_timer>0:
+                        ghost.dead_timer-=1
                     if self.player.rect.colliderect(ghost.rect):
-                        self.lose_life()
-                        play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
+                        if frightened_mode==False:
+                            self.lose_life()
+                            play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
+                        else:
+                            ghost.die()
 
                 if self.start_level:
                     self.create_map_objects()
@@ -436,10 +473,13 @@ class GameController:
                 #for tile in self.walls:
                     #tile.draw(self.screen)
                 for ghost in self.ghosts:
-                    ghost.draw(self.screen)
+                    if ghost.dead_timer==0:
+                        ghost.draw(self.screen)
                 self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
+                for power_dot in self.power_dots:
+                    power_dot.draw(self.screen)
                 game.draw_lives()
 
                 if not self.dots:
@@ -451,6 +491,7 @@ class GameController:
                 high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
                 self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
 
+                frightened_mode_timer-=1
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
 
