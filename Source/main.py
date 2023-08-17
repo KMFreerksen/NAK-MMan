@@ -452,6 +452,7 @@ class GameController:
                         self.screen.blit(self.surface, (0, 0))
                         self.draw_board()
                         if self.start_level:
+                            self.create_sprite_objects()
                             self.create_map_objects()
                             self.start_level = False
                         for ghoste in self.ghosts:
@@ -473,6 +474,10 @@ class GameController:
                 dt = self.clock.tick(FRAME_RATE) / 1000
                 self.screen.blit(self.surface, (0, 0))
 
+                self.player.update(dt, self.obstacles)
+                for sprite in self.all_sprites:
+                    self.screen.blit(sprite.image, sprite.rect)
+                self.draw_board()
                 # self.player.handle_keys()
                 for ghost in self.ghosts:
                     if ghost.dead_timer == 0:
@@ -517,7 +522,7 @@ class GameController:
 
                     if ghost.dead_timer==0:
                         ghost.draw(self.screen)
-                self.player.draw(self.screen)
+                #self.player.draw(self.screen)
 
                 for dot in self.dots:
                     dot.draw(self.screen)
