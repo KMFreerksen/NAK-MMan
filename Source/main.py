@@ -345,7 +345,6 @@ class GameController:
     def draw_lives(self):
         i = PACMAN_SIZE/2
         for life in range(self.lives):
-            #pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE/2)
             self.screen.blit(pygame.transform.scale(pygame.image.load('images/1.png'), (PACMAN_SIZE, PACMAN_SIZE)),
                              (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 1.5 * PACMAN_SIZE))
             i += PACMAN_SIZE * 2
@@ -353,7 +352,6 @@ class GameController:
     def draw_lives(self):
         i = PACMAN_SIZE / 2
         for _ in range(self.player.lives):
-            #pygame.draw.circle(self.screen, YELLOW, (i + PACMAN_SIZE, SCREEN_HEIGHT - PACMAN_SIZE), PACMAN_SIZE / 2)
             self.screen.blit(pygame.transform.scale(pygame.image.load('images/1.png'), (PACMAN_SIZE, PACMAN_SIZE)),
                              (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 1.5 * PACMAN_SIZE))
             i += PACMAN_SIZE * 2
