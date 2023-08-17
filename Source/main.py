@@ -4,18 +4,19 @@ import random
 import math
 import os
 from enum import Enum
-from board import *
+from board import boards
 from sprite import *
 from sounds import *
 
 pygame.init()
-
-SCREEN_WIDTH, SCREEN_HEIGHT = 700, 750
+vec = pygame.math.Vector2
+TILE_SIZE = 25
+SCREEN_WIDTH, SCREEN_HEIGHT = (TILE_SIZE * 30), (TILE_SIZE * 34 + 80)
 PACMAN_SIZE = 30
 DOT_SIZE = 20
+TILE_HEIGHT = TILE_SIZE
+TILE_WIDTH = TILE_SIZE
 POWER_DOT_SIZE = 30
-TILE_HEIGHT = ((SCREEN_HEIGHT - 50) // 34)
-TILE_WIDTH = (SCREEN_WIDTH // 30)
 BLACK = (0, 0, 0)
 BLUE = (25, 25, 166)
 WHITE = (255, 255, 255)
@@ -24,7 +25,7 @@ RED = (255, 0, 0)
 PI = math.pi
 FRAME_RATE = 30
 PACKMAN_IMG_CYCLE = 0
-PLAYER_SPEED = 5
+PLAYER_SPEED = 10 * TILE_SIZE
 
 CHANGE_DIRECTION_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(CHANGE_DIRECTION_EVENT, 1000)
@@ -37,11 +38,10 @@ class State(Enum):
     START = 1
     GAME = 2
     GAMEOVER = 3
-    
     PREGAME = 4
 
 
-class Ghost:
+class Ghost():
 
     def __init__(self, x, y, color):
         self.image =pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(34,30))
@@ -54,8 +54,8 @@ class Ghost:
         screen.blit(self.image, self.rect)
 
     def update(self, tiles, ghosts):
-        flag=1
-        while(flag):
+        flag = 1
+        while flag:
             self.new_rect = self.rect.copy()
             if self.direction == 'up':
                 self.new_rect.move_ip(0, -5)
@@ -67,12 +67,14 @@ class Ghost:
                 self.new_rect.move_ip(5, 0)
             if (not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall)) and self.direction != self.previous_move[0]:
                 self.rect = self.new_rect
+
                 flag=0
                 if self.direction != self.previous_move[1]:
                     self.previous_move[0]=self.previous_move[1]
                     self.previous_move[1]=self.direction
             else:
-                self.direction=random.choice(['up', 'down', 'left', 'right'])
+                self.direction = random.choice(['up', 'down', 'left', 'right'])
+
     def out (self, screen):
         self.clock=pygame.time.Clock()
         
@@ -80,63 +82,94 @@ class Ghost:
         self.x=330
         self.y=270
         self.dead_timer=5*FRAME_RATE
-class Player:
+        
+        
+class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        self.rect = pygame.Rect(x, y, PACMAN_SIZE, PACMAN_SIZE)
-        self.new_rect = self.rect
-
-        self.starting_pos = (x, y)
+        super().__init__()
+        self.pos = vec(x, y) * TILE_SIZE
+        self.player_img = []
+        self.packman_img_cycle = 0
+        for i in range(1, 4):
+            self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (25, 25)))
+        self.image = self.player_img[0]
+        self.rect = self.image.get_rect(topleft=(self.pos.x, self.pos.y))
         self.score = 0
         self.lives = 3
+        # added for movement
+        self.move_buffer = 20
+        self.vel = vec(0, 0)
+        self.dirvec = vec(0, 0)
+        self.last_pos = self.pos
+        self.next_pos = self.pos
+        self.current_frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.between_tiles = False
+        self.starting_pos = vec(x, y) * TILE_SIZE
 
-        self.x = x
-        self.y = y
-        self.player_img = []
-        self.packman_img_cycle = PACKMAN_IMG_CYCLE
-        self.direction = 0
-        for i in range(1, 4):
+    def update(self, dt, walls):
+        self.handle_keys()
+        self.rect = self.image.get_rect(topleft=(self.pos.x, self.pos.y))
 
-            self.player_img.append(pygame.transform.scale(pygame.image.load(f'images/{i}.png'), (30, 30)))
+        if self.pos != self.next_pos:
+            delta = self.next_pos - self.pos
+            if delta.length() > (self.dirvec * PLAYER_SPEED * dt).length():
+                self.pos += self.dirvec * PLAYER_SPEED * dt
+            else:
+                self.pos = self.next_pos
+                self.dirvec = vec(0, 0)
+                self.between_tiles = False
+        self.rect.topleft = self.pos
+        if pygame.sprite.spritecollide(self, walls, False):
+            self.pos = self.last_pos
+            self.next_pos = self.last_pos
+            self.dirvec = vec(0, 0)
+            self.between_tiles = False
+        self.rect.topleft = self.pos
 
-
-    def handle_keys(self, tiles):
+    def handle_keys(self):
         key = pygame.key.get_pressed()
-        dist = 3
-        self.new_rect = self.rect.copy()
-        if key[pygame.K_DOWN]:  # down key
-            self.new_rect.move_ip(0, dist)
-            self.direction = 3
-        elif key[pygame.K_UP]:  # up key
-            self.new_rect.move_ip(0, -dist)
-            self.direction = 1
-        elif key[pygame.K_LEFT]:  # left key
-            self.new_rect.move_ip(-dist, 0)
-            self.direction = 2
-        elif key[pygame.K_RIGHT]:  # right key
-            self.new_rect.move_ip(dist, 0)
-            self.direction = 0
+        now = pygame.time.get_ticks()
 
-        if not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall):
-            if self.new_rect.x <= 0:
-                self.new_rect.move_ip(SCREEN_WIDTH, 0)
-            if self.new_rect.x >= SCREEN_WIDTH:
-                self.new_rect.move_ip(-SCREEN_WIDTH, 0)
-            self.rect = self.new_rect
-   
-    def draw(self, screen):
-        self.screen = screen
-        # direction definition: 0: right, 1: up, 2: left, 3: down
-        if self.direction == 0:
-            self.screen.blit(self.player_img[self.packman_img_cycle // 4], [self.rect.x, self.rect.y])
-        if self.direction == 1:
-            self.screen.blit(pygame.transform.rotate(self.player_img[self.packman_img_cycle // 4], 90),
-                                 [self.rect.x, self.rect.y])
-        if self.direction == 2:
-            self.screen.blit(pygame.transform.flip(self.player_img[self.packman_img_cycle // 4], True, False),
-                                 [self.rect.x, self.rect.y])
-        if self.direction == 3:
-            self.screen.blit(pygame.transform.rotate(self.player_img[self.packman_img_cycle // 4], -90),
-                                 [self.rect.x, self.rect.y])
+        if now - self.last_update > self.move_buffer:
+            self.last_update = now
+
+            new_dir_vec = vec(0, 0)
+            if self.dirvec.y == 0:
+                if key[pygame.K_LEFT]:  # left key
+                    new_dir_vec = vec(-1, 0)
+                    self.image = pygame.transform.flip(self.player_img[self.packman_img_cycle // 4], True, False)
+                elif key[pygame.K_RIGHT]:  # right key
+                    new_dir_vec = vec(1, 0)
+                    self.image = self.player_img[self.packman_img_cycle // 4]
+            if self.dirvec.x == 0:
+                if key[pygame.K_DOWN]:  # down key
+                    new_dir_vec = vec(0, 1)
+                    self.image = pygame.transform.rotate(self.player_img[self.packman_img_cycle // 4], -90)
+                elif key[pygame.K_UP]:  # up key
+                    new_dir_vec = vec(0, -1)
+                    self.image = pygame.transform.rotate(self.player_img[self.packman_img_cycle // 4], 90)
+
+            if new_dir_vec != vec(0, 0):
+                self.dirvec = new_dir_vec
+                self.between_tiles = True
+                current_index = self.rect.centerx // TILE_SIZE, self.rect.centery // TILE_SIZE
+                self.last_pos = vec(current_index) * TILE_SIZE
+                self.next_pos = self.last_pos + self.dirvec * TILE_SIZE
+
+            if self.packman_img_cycle < 11:
+                self.packman_img_cycle += 1
+            else:
+                self.packman_img_cycle = 0
+
+
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
+        # self.image.fill(BLUE)
+        self.rect = self.image.get_rect(topleft=(x * TILE_SIZE, y * TILE_SIZE))
+
 
 class Dot:
     def __init__(self, x, y):
@@ -176,19 +209,19 @@ class GameController:
         self.state = State.START
         self.level = boards
         self.player = Player(100, 120)  # Pass the starting number of lives (3 in this case)
-        #self.player = Player(100, 120)
+        # self.player = Player(100, 120)
         self.dots = []
-
         self.power_dots = []
-
         self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'Dawn.jpg')]
         self.walls = []
-        self.lives = 3
+        # self.lives = 3
         self.sounds = Sounds()
+        self.ghost_sprites = pygame.sprite.Group()
+        self.all_sprites = pygame.sprite.Group()
+        self.obstacles = pygame.sprite.Group()
+        self.start_pos = []
 
-        self.player_lives = 3
-
-
+        # self.player_lives = 3
 
     def draw_start_menu(self):
         if self.state == State.START:
@@ -268,9 +301,6 @@ class GameController:
                                        0.6))
                 if self.level[i][j] == 9:
                     pass
-                if self.level[i][j] == 10:
-                    self.player = Player(j * TILE_WIDTH + (TILE_WIDTH * 0.3), i * TILE_HEIGHT - 6)
-
 
 
     def draw_board(self):
@@ -326,18 +356,11 @@ class GameController:
                                 [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
                                  TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 5)
 
-
     def restart_level(self):
-        self.player.rect = pygame.Rect(self.player.starting_pos[0], self.player.starting_pos[1], PACMAN_SIZE,
-                                       PACMAN_SIZE)
+        self.player.kill()
+        self.player = Player(self.start_pos[0], self.start_pos[1])
+        self.all_sprites.add(self.player)
 
-   #def lose_life(self):
-   #     if self.lives == 1:
-   #         self.lives = 0
-   #         self.state = State.GAMEOVER
-   #     else:
-   #         self.lives -= 1
-   #         self.restart_level()
     def lose_life(self):
         if self.player.lives == 1:
             self.state = State.GAMEOVER
@@ -346,19 +369,33 @@ class GameController:
             self.restart_level()
 
     def draw_lives(self):
-        i = PACMAN_SIZE/2
-        for life in range(self.lives):
-            self.screen.blit(pygame.transform.scale(pygame.image.load('images/1.png'), (PACMAN_SIZE, PACMAN_SIZE)),
-                             (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 1.5 * PACMAN_SIZE))
-            i += PACMAN_SIZE * 2
-
-    def draw_lives(self):
         i = PACMAN_SIZE / 2
         for _ in range(self.player.lives):
             self.screen.blit(pygame.transform.scale(pygame.image.load('images/1.png'), (PACMAN_SIZE, PACMAN_SIZE)),
                              (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 1.5 * PACMAN_SIZE))
             i += PACMAN_SIZE * 2
 
+    def create_sprite_objects(self):
+        for row, tiles in enumerate(self.level):
+            for col, tile in enumerate(tiles):
+                if tile in [3, 4, 5, 6, 7, 8, 9]:
+                    obstacle = Obstacle(col, row)
+                    self.obstacles.add(obstacle)
+                    self.all_sprites.add(obstacle)
+                elif tile == 'P':
+                    self.player = Player(col, row)
+                    self.all_sprites.add(self.player)
+                    self.start_pos.append(col)
+                    self.start_pos.append(row)
+            #for ghost in self.ghosts:
+                #self.ghost_sprites.add(ghost)
+                #self.all_sprites.add(ghost)
+    def create_dots(self):
+        for i in range(len(self.level)):
+            for j in range(len(self.level[i])):
+                if self.level[i][j] == 1:
+                    self.add_dot(
+                        Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
     def main(self):
         if os.path.exists(HIGH_SCORE_FILE):
             with open(HIGH_SCORE_FILE, 'r') as f:
@@ -374,7 +411,7 @@ class GameController:
 
         while self.running:
 
-            self.player.packman_img_cycle = self.player.packman_img_cycle + 1 if self.player.packman_img_cycle < 11 else 0
+            #self.player.packman_img_cycle = self.player.packman_img_cycle + 1 if self.player.packman_img_cycle < 11 else 0
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -395,12 +432,14 @@ class GameController:
             if game.state == State.PREGAME:
                 self.screen.blit(self.surface, (0, 0))
                 self.draw_board()
+                self.create_sprite_objects()
                 if self.start_level:
                     self.create_map_objects()
+                    self.create_dots()
                     self.start_level = False
                 for ghoste in self.ghosts:
                     ghoste.draw(self.screen)
-                    self.player.draw(self.screen)
+                    #self.player.draw(self.screen)
                 for dot in self.dots:
                     dot.draw(self.screen)
                 for power_dot in self.power_dots:
@@ -421,8 +460,6 @@ class GameController:
                             dot.draw(self.screen)
                         game.draw_lives()
 
-
-
                         #score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
                         #self.screen.blit(score_text, (10, 10))
                         #high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
@@ -431,13 +468,12 @@ class GameController:
                         ghost.rect.move_ip(0,-5)
                         pygame.display.flip()
                         self.clock.tick(FRAME_RATE)
-                game.state=State.GAME
+                game.state = State.GAME
             if game.state == State.GAME:
-
+                dt = self.clock.tick(FRAME_RATE) / 1000
                 self.screen.blit(self.surface, (0, 0))
-                self.draw_board()
-                self.player.handle_keys(self.walls)
 
+                # self.player.handle_keys()
                 for ghost in self.ghosts:
                     if ghost.dead_timer == 0:
                         ghost.update(self.walls, self.ghosts)
@@ -457,9 +493,9 @@ class GameController:
                         self.player.score += 1  # Increase the score when a dot is eaten
                         if self.player.score > high_score:
                             high_score = self.player.score
-                        if self.player.score >= 20:
+                        if self.player.score >= 20 and self.player.score % 20 == 0:
                             self.player.lives += 1
-                            self.player.score = 0
+
                             self.sounds.play_extra_life()
                 for ghost in self.ghosts:
                     if ghost.dead_timer>0:
@@ -478,9 +514,11 @@ class GameController:
                 #for tile in self.walls:
                     #tile.draw(self.screen)
                 for ghost in self.ghosts:
+
                     if ghost.dead_timer==0:
                         ghost.draw(self.screen)
                 self.player.draw(self.screen)
+
                 for dot in self.dots:
                     dot.draw(self.screen)
                 for power_dot in self.power_dots:
@@ -504,9 +542,10 @@ class GameController:
                 game.draw_game_over_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
-                    self.start_level = True
-                    self.dots.clear()
+                    self.player = Player(100, 200)
                     self.walls.clear()
+                    self.dots.clear()
+                    self.start_level = True
                     self.state = State.START
                 if key[pygame.K_q]:
                     self.running = False

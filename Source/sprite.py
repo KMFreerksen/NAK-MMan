@@ -47,7 +47,7 @@ class Blinky(Characters):
         self.current_image = 0
         self.image = self.images[self.current_image]
         self.rect = self.image.get_rect()
-        print("test veriftied")
+        #print("test veriftied")
 
     def update(self, ghosts):
         self.current_image = (self.current_image + 1) % len(self.images)
