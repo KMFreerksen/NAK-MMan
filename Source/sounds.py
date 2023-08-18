@@ -41,32 +41,32 @@ def play_sound(sound_file):
 
 
 def play_pacman_intro():  # Working in code
-    sound_file = "pacman_beginning.wav"
+    sound_file = "sounds/pacman_beginning.wav"
     play_sound(sound_file)
 
 
 def play_pacman_eating():  # Working in code
-    sound_file = "pacman_chomp.wav"
+    sound_file = "sounds/pacman_chomp.wav"
     play_sound(sound_file)
 
 
 def play_pacman_eat_ghost():
-    sound_file = "pacman_eat-ghost.wav"
+    sound_file = "sounds/pacman_eat-ghost.wav"
     play_sound(sound_file)
 
 
 def play_pacman_extra_life():
-    sound_file = "pacman_extract.wav"
+    sound_file = "sounds/pacman_extract.wav"
     play_sound(sound_file)
 
 
 def play_pacman_eat_fruit():
-    sound_file = "pacman_eatfruit.wav"
+    sound_file = "sounds/pacman_eatfruit.wav"
     play_sound(sound_file)
 
 
 def play_pacman_dies():  # Working in code
-    sound_file = "pacman_death.wav"
+    sound_file = "sounds/pacman_death.wav"
     play_sound(sound_file)
 
 
