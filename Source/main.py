@@ -26,6 +26,7 @@ PI = math.pi
 FRAME_RATE = 30
 PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
+MAX_LEVEL = 2
 
 CHANGE_DIRECTION_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(CHANGE_DIRECTION_EVENT, 1000)
@@ -124,6 +125,14 @@ class Player(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, walls, False):
             self.pos = self.last_pos
             self.next_pos = self.last_pos
+            self.dirvec = vec(0, 0)
+            self.between_tiles = False
+        if self.rect.topleft[0] <= 0:
+            self.pos = vec(30, self.rect.centery // TILE_SIZE) * TILE_SIZE
+            self.dirvec = vec(0, 0)
+            self.between_tiles = False
+        if self.rect.topleft[0] >= SCREEN_WIDTH:
+            self.pos = vec(1, self.rect.centery // TILE_SIZE) * TILE_SIZE
             self.dirvec = vec(0, 0)
             self.between_tiles = False
         self.rect.topleft = self.pos
