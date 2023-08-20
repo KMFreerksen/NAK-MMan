@@ -286,6 +286,12 @@ class GameController:
     def add_power_dot(self, dot):
         self.power_dots.append(dot)
 
+    def draw_dots(self):
+        for dot in self.dots:
+            dot.draw(self.screen)
+        for pdot in self.power_dots:
+            pdot.draw(self.screen)
+
     def draw_board(self):
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
@@ -430,13 +436,9 @@ class GameController:
                     self.create_dots()
                     self.start_level = False
                 self.draw_board()
-                for ghoste in self.ghosts:
-                    ghoste.draw(self.screen)
-
-                for dot in self.dots:
-                    dot.draw(self.screen)
-                for power_dot in self.power_dots:
-                    power_dot.draw(self.screen)
+                for ghost in self.ghosts:
+                    ghost.draw(self.screen)
+                self.draw_dots()
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
                 game.draw_lives()
@@ -447,10 +449,7 @@ class GameController:
                         self.draw_board()
                         for ghoste in self.ghosts:
                             ghoste.draw(self.screen)
-                        for dot in self.dots:
-                            dot.draw(self.screen)
-                        for power_dot in self.power_dots:
-                            power_dot.draw(self.screen)
+                        self.draw_dots()
                         ghost.rect.move_ip(0, -5)
                         pygame.display.flip()
                         self.clock.tick(FRAME_RATE)
@@ -467,10 +466,7 @@ class GameController:
                     self.create_dots()
                     self.start_level = False
 
-                for dot in self.dots:
-                    dot.draw(self.screen)
-                for power_dot in self.power_dots:
-                    power_dot.draw(self.screen)
+                self.draw_dots()
 
                 self.player.update(dt, self.obstacles)
                 for sprite in self.all_sprites:
