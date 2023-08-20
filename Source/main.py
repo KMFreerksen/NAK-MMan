@@ -532,7 +532,7 @@ class GameController:
                         self.state = State.PREGAME
 
                     
-                score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
+                score_text = SCORE_FONT.render("Score: %d" % self.score, True, (255, 255, 255))
                 self.screen.blit(score_text, (10, 10))
                 high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
                 self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
