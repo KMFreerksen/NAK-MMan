@@ -395,6 +395,21 @@ class GameController:
                     self.add_power_dot(
                         Power_Dot((j * TILE_SIZE + (0.5 * TILE_SIZE) - 5), (i * TILE_SIZE + (0.5 * TILE_SIZE) - 5)))
 
+    def reset_game(self):
+        self.player.kill()
+        for ghost in self.ghosts:
+            ghost.kill()
+        for sprite in self.all_sprites:
+            sprite.kill()
+        self.dots.clear()
+        self.power_dots.clear()
+        self.start_level = True
+        self.lives = 3
+        self.level = 1
+        self.board = boards
+        self.score = 0
+        self.state = State.START
+
     def main(self):
         if os.path.exists(HIGH_SCORE_FILE):
             with open(HIGH_SCORE_FILE, 'r') as f:
@@ -467,10 +482,8 @@ class GameController:
                     self.start_level = False
 
                 self.draw_dots()
-
                 self.player.update(dt, self.obstacles)
-                for sprite in self.all_sprites:
-                    self.screen.blit(sprite.image, sprite.rect)
+                self.screen.blit(self.player.image, self.player.rect)
                 self.draw_board()
 
                 for ghost in self.ghosts:
@@ -512,7 +525,7 @@ class GameController:
                         ghost.draw(self.screen)
                 game.draw_lives()
 
-                if not self.dots:
+                if not self.dots and not self.power_dots:
                     if self.level == 2:
                         self.state = State.WIN
                     elif self.level == 1:
@@ -539,19 +552,7 @@ class GameController:
                 game.draw_win_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
-                    self.player.kill()
-                    for ghost in self.ghosts:
-                        ghost.kill()
-                    for sprite in self.all_sprites:
-                        sprite.kill()
-                    self.dots.clear()
-                    self.power_dots.clear()
-                    self.start_level = True
-                    self.lives = 3
-                    self.level = 1
-                    self.board = boards
-                    self.score = 0
-                    self.state = State.START
+                    self.reset_game()
                 if key[pygame.K_q]:
                     self.running = False
 
@@ -559,19 +560,7 @@ class GameController:
                 game.draw_game_over_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
-                    self.player.kill()
-                    for ghost in self.ghosts:
-                        ghost.kill()
-                    for sprite in self.all_sprites:
-                        sprite.kill()
-                    self.dots.clear()
-                    self.power_dots.clear()
-                    self.start_level = True
-                    self.lives = 3
-                    self.level = 1
-                    self.board = boards
-                    self.score = 0
-                    self.state = State.START
+                    self.reset_game()
                 if key[pygame.K_q]:
                     self.running = False
 
