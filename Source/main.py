@@ -539,10 +539,12 @@ class GameController:
                         self.start_level = True
                         self.state = State.PREGAME
 
-                score_text = SCORE_FONT.render("Score: %d" % self.score, True, (255, 255, 255))
+                score_text = SCORE_FONT.render("Score: %d" % self.score, True, WHITE)
                 self.screen.blit(score_text, (10, 10))
-                high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
+                high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, WHITE)
                 self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
+                fright_time = SCORE_FONT.render('Fright: %d' % frightened_mode_timer, True, WHITE)
+                self.screen.blit(fright_time, (SCREEN_WIDTH / 2 - fright_time.get_width()/2, 10))
 
                 frightened_mode_timer -= 1
                 pygame.display.flip()
@@ -550,6 +552,8 @@ class GameController:
 
             if game.state == State.WIN:
                 game.draw_win_screen()
+                with open(HIGH_SCORE_FILE, 'w') as f:
+                    f.write(str(high_score))
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
                     self.reset_game()
@@ -558,6 +562,8 @@ class GameController:
 
             if game.state == State.GAME_OVER:
                 game.draw_game_over_screen()
+                with open(HIGH_SCORE_FILE, 'w') as f:
+                    f.write(str(high_score))
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
                     self.reset_game()
