@@ -14,8 +14,6 @@ TILE_SIZE = 25
 SCREEN_WIDTH, SCREEN_HEIGHT = (TILE_SIZE * 31), (TILE_SIZE * 34 + 80)
 PACMAN_SIZE = 30
 DOT_SIZE = 4
-TILE_HEIGHT = TILE_SIZE
-TILE_WIDTH = TILE_SIZE
 POWER_DOT_SIZE = 8
 BLACK = (0, 0, 0)
 BLUE = (25, 25, 166)
@@ -24,7 +22,7 @@ YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 PI = math.pi
 FRAME_RATE = 30
-#PACKMAN_IMG_CYCLE = 0
+# PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
 GHOST_SPEED = 5
 GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'jason.jpg', 'dawn.jpg']
@@ -40,7 +38,7 @@ SCORE_FONT = pygame.font.Font(None, 36)
 class State(Enum):
     START = 1
     GAME = 2
-    GAMEOVER = 3
+    GAME_OVER = 3
     PREGAME = 4
     WIN = 5
 
@@ -49,12 +47,12 @@ class Ghost(pygame.sprite.Sprite):
 
     def __init__(self, x, y, color):
         super().__init__()
-        self.image = pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(TILE_SIZE,TILE_SIZE))
+        self.image = pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'), (TILE_SIZE, TILE_SIZE))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
         self.dead_timer = 0
-        self.previous_move=['ss','ss']
+        self.previous_move = ['ss', 'ss']
         self.spawn_pos = [x, y - TILE_SIZE * 2]
         self.x = 0
         self.y = 0
@@ -74,13 +72,14 @@ class Ghost(pygame.sprite.Sprite):
                 self.new_rect.move_ip(-GHOST_SPEED, 0)
             elif self.direction == 'right':
                 self.new_rect.move_ip(GHOST_SPEED, 0)
-            if (not any(wall.rect.colliderect(self.new_rect) for wall in obstacles)) and self.direction != self.previous_move[0]:
+            if (not any(wall.rect.colliderect(self.new_rect) for wall in obstacles)) and self.direction != \
+                    self.previous_move[0]:
                 self.rect = self.new_rect
 
-                flag=0
+                flag = 0
                 if self.direction != self.previous_move[1]:
-                    self.previous_move[0]=self.previous_move[1]
-                    self.previous_move[1]=self.direction
+                    self.previous_move[0] = self.previous_move[1]
+                    self.previous_move[1] = self.direction
             else:
                 self.direction = random.choice(['up', 'down', 'left', 'right'])
 
@@ -199,6 +198,7 @@ class Dot:
     def draw(self, screen):
         pygame.draw.circle(screen, WHITE, ((self.x + DOT_SIZE/2), (self.y + DOT_SIZE/2)), DOT_SIZE)
 
+
 class Power_Dot:
     def __init__(self, x, y):
         self.rect = pygame.Rect(x, y, POWER_DOT_SIZE, POWER_DOT_SIZE)
@@ -207,6 +207,7 @@ class Power_Dot:
 
     def draw(self, screen):
         pygame.draw.circle(screen, WHITE, ((self.x + POWER_DOT_SIZE/2), (self.y + POWER_DOT_SIZE/2)), POWER_DOT_SIZE)
+
 
 class Tile:
     def __init__(self, x, y, w, h, is_wall=True):
@@ -253,7 +254,7 @@ class GameController:
             pygame.display.flip()
 
     def draw_game_over_screen(self):
-        if self.state == State.GAMEOVER:
+        if self.state == State.GAME_OVER:
             title_font = pygame.font.SysFont('impact', 48)
             title = title_font.render('Game Over', True, YELLOW, BLACK)
             button_font = pygame.font.SysFont('impact', 32)
@@ -292,51 +293,53 @@ class GameController:
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
                 if self.board[i][j] == 3:
-                    pygame.draw.line(self.screen, RED, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
-                                     (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 3)
+                    pygame.draw.line(self.screen, RED, (j * TILE_SIZE + (0.5 * TILE_SIZE), i * TILE_SIZE),
+                                     (j * TILE_SIZE + (0.5 * TILE_SIZE), i * TILE_SIZE + TILE_SIZE), 3)
                 if self.board[i][j] == 4:
-                    pygame.draw.line(self.screen, RED, (j * TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
-                                     (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
+                    pygame.draw.line(self.screen, RED, (j * TILE_SIZE, i * TILE_SIZE + (0.5 * TILE_SIZE)),
+                                     (j * TILE_SIZE + TILE_SIZE, i * TILE_SIZE + (0.5 * TILE_SIZE)), 3)
                 if self.board[i][j] == 5:
-                    pygame.draw.arc(self.screen, RED, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT +
-                                                        (0.5 * TILE_HEIGHT)), TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 3)
+                    pygame.draw.arc(self.screen, RED, [(j * TILE_SIZE - (TILE_SIZE * 0.4) - 2),
+                                                       (i * TILE_SIZE + (0.5 * TILE_SIZE)), TILE_SIZE, TILE_SIZE], 0,
+                                    PI / 2, 3)
                 if self.board[i][j] == 6:
-                    pygame.draw.arc(self.screen, RED, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT +
-                                                        (0.5 * TILE_HEIGHT)), TILE_WIDTH, TILE_HEIGHT], PI / 2, PI, 3)
+                    pygame.draw.arc(self.screen, RED, [(j * TILE_SIZE + (TILE_SIZE * 0.5)),
+                                                       (i * TILE_SIZE + (0.5 * TILE_SIZE)), TILE_SIZE, TILE_SIZE],
+                                    PI / 2, PI, 3)
                 if self.board[i][j] == 7:
                     pygame.draw.arc(self.screen, RED,
-                                    [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                     TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
+                                    [(j * TILE_SIZE + (TILE_SIZE * 0.5)), (i * TILE_SIZE - (0.4 * TILE_SIZE)),
+                                     TILE_SIZE, TILE_SIZE], PI, 3 * PI / 2, 3)
                 if self.board[i][j] == 8:
                     pygame.draw.arc(self.screen, RED,
-                                    [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                     TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 3)
+                                    [(j * TILE_SIZE - (TILE_SIZE * 0.4) - 2), (i * TILE_SIZE - (0.4 * TILE_SIZE)),
+                                     TILE_SIZE, TILE_SIZE], 3 * PI / 2, 2 * PI, 3)
                 if self.board[i][j] == 9:
-                    pygame.draw.line(self.screen, WHITE, (j * TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
-                                     (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
+                    pygame.draw.line(self.screen, WHITE, (j * TILE_SIZE, i * TILE_SIZE + (0.5 * TILE_SIZE)),
+                                     (j * TILE_SIZE + TILE_SIZE, i * TILE_SIZE + (0.5 * TILE_SIZE)), 3)
                 # So the 'COHORT' is a different color (BLUE)
                 if self.board[i][j] == 10:
-                    pygame.draw.line(self.screen, BLUE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
-                                 (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 5)
+                    pygame.draw.line(self.screen, BLUE, (j * TILE_SIZE + (0.5 * TILE_SIZE), i * TILE_SIZE),
+                                     (j * TILE_SIZE + (0.5 * TILE_SIZE), i * TILE_SIZE + TILE_SIZE), 5)
                 if self.board[i][j] == 11:
-                    pygame.draw.line(self.screen, BLUE, (j * TILE_HEIGHT, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
-                                 (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 5)
+                    pygame.draw.line(self.screen, BLUE, (j * TILE_SIZE, i * TILE_SIZE + (0.5 * TILE_SIZE)),
+                                     (j * TILE_SIZE + TILE_SIZE, i * TILE_SIZE + (0.5 * TILE_SIZE)), 5)
                 if self.board[i][j] == 12:
-                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT +
-                                                                                                (0.5 * TILE_HEIGHT)),
-                                                    TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 5)
+                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_SIZE - (TILE_SIZE * 0.4) - 2), (i * TILE_SIZE +
+                                                                                                  (0.5 * TILE_SIZE)),
+                                                        TILE_SIZE, TILE_SIZE], 0, PI / 2, 5)
                 if self.board[i][j] == 13:
-                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT +
-                                                                                            (0.5 * TILE_HEIGHT)),
-                                                    TILE_WIDTH, TILE_HEIGHT], PI / 2, PI, 5)
+                    pygame.draw.arc(self.screen, BLUE, [(j * TILE_SIZE + (TILE_SIZE * 0.5)), (i * TILE_SIZE +
+                                                                                              (0.5 * TILE_SIZE)),
+                                                        TILE_SIZE, TILE_SIZE], PI / 2, PI, 5)
                 if self.board[i][j] == 14:
                     pygame.draw.arc(self.screen, BLUE,
-                                [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                 TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 5)
+                                    [(j * TILE_SIZE + (TILE_SIZE * 0.5)), (i * TILE_SIZE - (0.4 * TILE_SIZE)),
+                                     TILE_SIZE, TILE_SIZE], PI, 3 * PI / 2, 5)
                 if self.board[i][j] == 15:
                     pygame.draw.arc(self.screen, BLUE,
-                                [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                 TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 5)
+                                    [(j * TILE_SIZE - (TILE_SIZE * 0.4) - 2), (i * TILE_SIZE - (0.4 * TILE_SIZE)),
+                                     TILE_SIZE, TILE_SIZE], 3 * PI / 2, 2 * PI, 5)
 
     def restart_level(self):
         self.player.kill()
@@ -345,7 +348,7 @@ class GameController:
 
     def lose_life(self):
         if self.lives == 1:
-            self.state = State.GAMEOVER
+            self.state = State.GAME_OVER
         else:
             self.lives -= 1
             self.restart_level()
@@ -384,10 +387,11 @@ class GameController:
             for j in range(len(self.board[i])):
                 if self.board[i][j] == 1:
                     self.add_dot(
-                        Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
+                        Dot((j * TILE_SIZE + (0.5 * TILE_SIZE) - 2), (i * TILE_SIZE + (0.5 * TILE_SIZE) - 2)))
                 if self.board[i][j] == 2:
                     self.add_power_dot(
-                        Power_Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 5)))
+                        Power_Dot((j * TILE_SIZE + (0.5 * TILE_SIZE) - 5), (i * TILE_SIZE + (0.5 * TILE_SIZE) - 5)))
+
     def main(self):
         if os.path.exists(HIGH_SCORE_FILE):
             with open(HIGH_SCORE_FILE, 'r') as f:
@@ -396,10 +400,10 @@ class GameController:
             high_score = 0
         pygame.mixer.init()
 
-        flag=1
-        frightened_mode=False
+        flag = 1
+        frightened_mode = False
         
-        frightened_mode_timer=0
+        frightened_mode_timer = 0
 
         while self.running:
 
@@ -449,7 +453,7 @@ class GameController:
                             dot.draw(self.screen)
                         for power_dot in self.power_dots:
                             power_dot.draw(self.screen)
-                        ghost.rect.move_ip(0,-5)
+                        ghost.rect.move_ip(0, -5)
                         pygame.display.flip()
                         self.clock.tick(FRAME_RATE)
                 game.state = State.GAME
@@ -482,7 +486,7 @@ class GameController:
                 for power_dot in self.power_dots:
                     if self.player.rect.colliderect(power_dot.rect):   
                         self.power_dots.remove(power_dot) 
-                        frightened_mode_timer= 20 * FRAME_RATE
+                        frightened_mode_timer = 20 * FRAME_RATE
                 if frightened_mode_timer > 0:
                     frightened_mode = True
                 else:
@@ -500,19 +504,17 @@ class GameController:
                             self.sounds.play_extra_life()
 
                 for ghost in self.ghosts:
-                    if ghost.dead_timer>0:
-                        ghost.dead_timer-=1
+                    if ghost.dead_timer > 0:
+                        ghost.dead_timer -= 1
                     if self.player.rect.colliderect(ghost.rect):
-                        if frightened_mode==False:
+                        if not frightened_mode:
                             self.lose_life()
                             play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
                         else:
                             ghost.die()
 
-                #for tile in self.walls:
-                    #tile.draw(self.screen)
                 for ghost in self.ghosts:
-                    if ghost.dead_timer==0:
+                    if ghost.dead_timer == 0:
                         ghost.draw(self.screen)
 
                 game.draw_lives()
@@ -531,13 +533,12 @@ class GameController:
                         self.start_level = True
                         self.state = State.PREGAME
 
-                    
                 score_text = SCORE_FONT.render("Score: %d" % self.score, True, (255, 255, 255))
                 self.screen.blit(score_text, (10, 10))
                 high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
                 self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
 
-                frightened_mode_timer-=1
+                frightened_mode_timer -= 1
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
 
@@ -561,7 +562,7 @@ class GameController:
                 if key[pygame.K_q]:
                     self.running = False
 
-            if game.state == State.GAMEOVER:
+            if game.state == State.GAME_OVER:
                 game.draw_game_over_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
