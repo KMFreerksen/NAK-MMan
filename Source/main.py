@@ -48,16 +48,20 @@ class Ghost(pygame.sprite.Sprite):
 
     def __init__(self, x, y, color):
         super().__init__()
-        self.image =pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(TILE_SIZE,TILE_SIZE))
+        self.image = pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(TILE_SIZE,TILE_SIZE))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
         self.dead_timer = 0
         self.previous_move=['ss','ss']
+        self.spawn_pos = [x, y - TILE_SIZE * 2]
+        self.x = 0
+        self.y = 0
+
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def update(self, tiles, ghosts):
+    def update(self, obstacles, ghosts):
         flag = 1
         while flag:
             self.new_rect = self.rect.copy()
@@ -69,7 +73,7 @@ class Ghost(pygame.sprite.Sprite):
                 self.new_rect.move_ip(-5, 0)
             elif self.direction == 'right':
                 self.new_rect.move_ip(5, 0)
-            if (not any(tile.rect.colliderect(self.new_rect) for tile in tiles)) and self.direction != self.previous_move[0]:
+            if (not any(wall.rect.colliderect(self.new_rect) for wall in obstacles)) and self.direction != self.previous_move[0]:
                 self.rect = self.new_rect
 
                 flag=0
@@ -82,10 +86,12 @@ class Ghost(pygame.sprite.Sprite):
     def out(self, screen):
         self.clock=pygame.time.Clock()
         
-    def die (self):
-        self.x=330
-        self.y=270
-        self.dead_timer=5*FRAME_RATE
+    def die(self):
+        self.x = self.spawn_pos[0]
+        self.y = self.spawn_pos[1]
+        self.rect = pygame.Rect(self.x, self.y, TILE_SIZE, TILE_SIZE)
+        self.new_rect = self.rect.copy()
+        self.dead_timer = 5*FRAME_RATE
         
         
 class Player(pygame.sprite.Sprite):
@@ -225,7 +231,6 @@ class GameController:
         self.dots = []
         self.power_dots = []
         self.ghosts = pygame.sprite.Group()
-        self.walls = []
         self.sounds = Sounds()
         self.ghost_sprites = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
@@ -284,46 +289,6 @@ class GameController:
 
     def add_wall(self, wall):
         self.walls.append(wall)
-
-    def create_map_objects(self):
-        for i in range(len(self.board)):
-            for j in range(len(self.board[i])):
-                if self.board[i][j] == 3:
-                    self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT))
-                if self.board[i][j] == 4:
-                    self.add_wall(Tile((j * TILE_WIDTH), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH, 3))
-                if self.board[i][j] == 5:
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
-                             3))
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
-                             TILE_HEIGHT * 0.7))
-                if self.board[i][j] == 6:
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
-                             TILE_HEIGHT * 0.5))
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
-                             TILE_HEIGHT * 0.7, 3))
-                if self.board[i][j] == 7:
-                    pygame.draw.arc(self.screen, BLUE,
-                                    [(j * TILE_HEIGHT + (TILE_HEIGHT * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
-                                     TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT * 0.6))
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
-                             TILE_WIDTH * 0.6, 3))
-                if self.board[i][j] == 8:
-                    self.add_wall(
-                        Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
-                             3))
-                    self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT *
-                                       0.6))
-                if self.board[i][j] == 9:
-                    pass
-
 
     def draw_board(self):
         for i in range(len(self.board)):
@@ -461,7 +426,6 @@ class GameController:
 
                 if self.start_level:
                     self.create_sprite_objects()
-                    #self.create_map_objects()
                     self.create_dots()
                     self.start_level = False
                 self.draw_board()
