@@ -83,9 +83,6 @@ class Ghost(pygame.sprite.Sprite):
             else:
                 self.direction = random.choice(['up', 'down', 'left', 'right'])
 
-    def out(self, screen):
-        self.clock = pygame.time.Clock()
-        
     def die(self):
         self.x = self.spawn_pos[0]
         self.y = self.spawn_pos[1]
@@ -227,7 +224,7 @@ class GameController:
         self.running = True
         self.start_level = True
         self.state = State.START
-        self.board = boards
+        self.board = boards3
         self.level = 1
         self.player = Player(100, 120)
         self.dots = []
@@ -364,7 +361,7 @@ class GameController:
         ghost_loc = []
         for row, tiles in enumerate(self.board):
             for col, tile in enumerate(tiles):
-                if tile in [3, 4, 5, 6, 7, 8, 9]:
+                if tile in [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]:
                     obstacle = Obstacle(col, row)
                     self.obstacles.add(obstacle)
                     self.all_sprites.add(obstacle)
@@ -421,7 +418,7 @@ class GameController:
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
                     game.state = State.PREGAME
-                    play_pacman_intro()  # self.sounds.play_intro()
+                    play_pacman_intro()
 
             if game.state == State.PREGAME:
                 self.screen.blit(self.surface, (0, 0))
@@ -443,6 +440,7 @@ class GameController:
                 pygame.display.flip()
                 self.clock.tick(FRAME_RATE)
                 game.draw_lives()
+                # self.sounds.play_intro()
                 for ghost in self.ghosts:
                     for i in range(11):
                         self.screen.blit(self.surface, (0, 0))
@@ -499,7 +497,7 @@ class GameController:
                         self.score += 1  # Increase the score when a dot is eaten
                         if self.score > high_score:
                             high_score = self.score
-                        if self.score >= 20 and self.score % 20 == 0:
+                        if self.score >= 300 and self.score % 300 == 0:
                             self.lives += 1
                             self.sounds.play_extra_life()
 
@@ -509,7 +507,7 @@ class GameController:
                     if self.player.rect.colliderect(ghost.rect):
                         if not frightened_mode:
                             self.lose_life()
-                            play_pacman_dies()  # self.sounds.play_pacman_dies()  # Play pacman dies sound
+                            play_pacman_dies()  # Play pacman dies sound
                         else:
                             ghost.die()
 
