@@ -11,7 +11,7 @@ from sounds import *
 pygame.init()
 vec = pygame.math.Vector2
 TILE_SIZE = 25
-SCREEN_WIDTH, SCREEN_HEIGHT = (TILE_SIZE * 30), (TILE_SIZE * 34 + 80)
+SCREEN_WIDTH, SCREEN_HEIGHT = (TILE_SIZE * 31), (TILE_SIZE * 34 + 80)
 PACMAN_SIZE = 30
 DOT_SIZE = 4
 TILE_HEIGHT = TILE_SIZE
@@ -288,9 +288,6 @@ class GameController:
     def add_power_dot(self, dot):
         self.power_dots.append(dot)
 
-    def add_wall(self, wall):
-        self.walls.append(wall)
-
     def draw_board(self):
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
@@ -426,6 +423,8 @@ class GameController:
                 self.screen.blit(self.surface, (0, 0))
 
                 if self.start_level:
+                    if self.level == 2:
+                        self.board = boards3
                     self.create_sprite_objects()
                     self.create_dots()
                     self.start_level = False
@@ -524,10 +523,13 @@ class GameController:
                     elif self.level == 1:
                         for sprite in self.all_sprites:
                             sprite.kill()
+                        for ghost in self.ghosts:
+                            ghost.kill()
                         self.dots.clear()
                         self.power_dots.clear()
                         self.level += 1
                         self.start_level = True
+                        self.state = State.PREGAME
 
                     
                 score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
@@ -548,10 +550,13 @@ class GameController:
                         ghost.kill()
                     for sprite in self.all_sprites:
                         sprite.kill()
-                    self.walls.clear()
                     self.dots.clear()
                     self.power_dots.clear()
                     self.start_level = True
+                    self.lives = 3
+                    self.level = 1
+                    self.board = boards
+                    self.score = 0
                     self.state = State.START
                 if key[pygame.K_q]:
                     self.running = False
@@ -565,12 +570,12 @@ class GameController:
                         ghost.kill()
                     for sprite in self.all_sprites:
                         sprite.kill()
-                    self.walls.clear()
                     self.dots.clear()
                     self.power_dots.clear()
                     self.start_level = True
                     self.lives = 3
                     self.level = 1
+                    self.board = boards
                     self.score = 0
                     self.state = State.START
                 if key[pygame.K_q]:
