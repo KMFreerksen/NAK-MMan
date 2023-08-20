@@ -4,7 +4,7 @@ import random
 import math
 import os
 from enum import Enum
-from board import boards
+from board import boards, boards3
 from sprite import *
 from sounds import *
 
@@ -24,7 +24,7 @@ YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 PI = math.pi
 FRAME_RATE = 30
-PACKMAN_IMG_CYCLE = 0
+#PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
 GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'jason.jpg', 'dawn.jpg']
 MAX_LEVEL = 2
@@ -48,7 +48,7 @@ class Ghost(pygame.sprite.Sprite):
 
     def __init__(self, x, y, color):
         super().__init__()
-        self.image =pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(34,30))
+        self.image =pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(TILE_SIZE,TILE_SIZE))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -69,7 +69,7 @@ class Ghost(pygame.sprite.Sprite):
                 self.new_rect.move_ip(-5, 0)
             elif self.direction == 'right':
                 self.new_rect.move_ip(5, 0)
-            if (not any(tile.rect.colliderect(self.new_rect) for tile in tiles if tile.is_wall)) and self.direction != self.previous_move[0]:
+            if (not any(tile.rect.colliderect(self.new_rect) for tile in tiles)) and self.direction != self.previous_move[0]:
                 self.rect = self.new_rect
 
                 flag=0
@@ -79,7 +79,7 @@ class Ghost(pygame.sprite.Sprite):
             else:
                 self.direction = random.choice(['up', 'down', 'left', 'right'])
 
-    def out (self, screen):
+    def out(self, screen):
         self.clock=pygame.time.Clock()
         
     def die (self):
@@ -461,7 +461,7 @@ class GameController:
 
                 if self.start_level:
                     self.create_sprite_objects()
-                    self.create_map_objects()
+                    #self.create_map_objects()
                     self.create_dots()
                     self.start_level = False
                 self.draw_board()
@@ -513,7 +513,7 @@ class GameController:
 
                 for ghost in self.ghosts:
                     if ghost.dead_timer == 0:
-                        ghost.update(self.walls, self.ghosts)
+                        ghost.update(self.obstacles, self.ghosts)
 
                 for power_dot in self.power_dots:
                     if self.player.rect.colliderect(power_dot.rect):   
