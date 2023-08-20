@@ -22,7 +22,7 @@ YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 PI = math.pi
 FRAME_RATE = 30
-# PACKMAN_IMG_CYCLE = 0
+PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
 GHOST_SPEED = 5
 GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'jason.jpg', 'dawn.jpg']
@@ -224,7 +224,7 @@ class GameController:
         self.running = True
         self.start_level = True
         self.state = State.START
-        self.board = boards3
+        self.board = boards
         self.level = 1
         self.player = Player(100, 120)
         self.dots = []
@@ -354,7 +354,7 @@ class GameController:
         i = PACMAN_SIZE / 2
         for _ in range(self.lives):
             self.screen.blit(pygame.transform.scale(pygame.image.load('images/1.png'), (PACMAN_SIZE, PACMAN_SIZE)),
-                             (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 1.5 * PACMAN_SIZE))
+                             (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 35))
             i += PACMAN_SIZE * 2
 
     def create_sprite_objects(self):
@@ -514,7 +514,6 @@ class GameController:
                 for ghost in self.ghosts:
                     if ghost.dead_timer == 0:
                         ghost.draw(self.screen)
-
                 game.draw_lives()
 
                 if not self.dots:
