@@ -44,9 +44,10 @@ class State(Enum):
     WIN = 5
 
 
-class Ghost():
+class Ghost(pygame.sprite.Sprite):
 
     def __init__(self, x, y, color):
+        super().__init__()
         self.image =pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'),(34,30))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
@@ -223,7 +224,7 @@ class GameController:
         self.player = Player(100, 120)
         self.dots = []
         self.power_dots = []
-        self.ghosts = []
+        self.ghosts = pygame.sprite.Group()
         self.walls = []
         self.sounds = Sounds()
         self.ghost_sprites = pygame.sprite.Group()
@@ -404,14 +405,15 @@ class GameController:
                 elif tile == 'P':
                     self.player = Player(col, row)
                     self.all_sprites.add(self.player)
-                    self.start_pos.append(col)
-                    self.start_pos.append(row)
+                    self.start_pos[0] = col
+                    self.start_pos[1] = row
                 elif tile == 'G':
                     ghost_loc.append((col * TILE_SIZE, row * TILE_SIZE))
         i = 0
         for loc in ghost_loc:
             ghost = Ghost(loc[0], loc[1], GHOST_IMGS[i])
-            self.ghosts.append(ghost)
+            self.ghosts.add(ghost)
+            # self.all_sprites.add(ghost)
             i += 1
 
     def create_dots(self):
@@ -576,9 +578,14 @@ class GameController:
                 game.draw_win_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
-                    self.player = Player(100, 200)
+                    self.player.kill()
+                    for ghost in self.ghosts:
+                        ghost.kill()
+                    for sprite in self.all_sprites:
+                        sprite.kill()
                     self.walls.clear()
                     self.dots.clear()
+                    self.power_dots.clear()
                     self.start_level = True
                     self.state = State.START
                 if key[pygame.K_q]:
@@ -588,7 +595,11 @@ class GameController:
                 game.draw_game_over_screen()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_p]:
-                    self.player = Player(100, 200)
+                    self.player.kill()
+                    for ghost in self.ghosts:
+                        ghost.kill()
+                    for sprite in self.all_sprites:
+                        sprite.kill()
                     self.walls.clear()
                     self.dots.clear()
                     self.power_dots.clear()
