@@ -188,7 +188,7 @@ class Dot:
         self.y = y
 
     def draw(self, screen):
-        pygame.draw.circle(screen, WHITE, ((self.x + 2), (self.y + 2)), 4)
+        pygame.draw.circle(screen, WHITE, ((self.x + DOT_SIZE/2), (self.y + DOT_SIZE/2)), DOT_SIZE)
 
 class Power_Dot:
     def __init__(self, x, y):
@@ -197,7 +197,7 @@ class Power_Dot:
         self.y = y
 
     def draw(self, screen):
-        pygame.draw.circle(screen, WHITE, ((self.x + 5), (self.y + 5)), 10)
+        pygame.draw.circle(screen, WHITE, ((self.x + POWER_DOT_SIZE/2), (self.y + POWER_DOT_SIZE/2)), POWER_DOT_SIZE)
 
 class Tile:
     def __init__(self, x, y, w, h, is_wall=True):
@@ -217,21 +217,20 @@ class GameController:
         self.running = True
         self.start_level = True
         self.state = State.START
-        self.level = boards
-        self.player = Player(100, 120)  # Pass the starting number of lives (3 in this case)
-        # self.player = Player(100, 120)
+        self.board = boards
+        self.level = 1
+        self.player = Player(100, 120)
         self.dots = []
         self.power_dots = []
         self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'Dawn.jpg')]
         self.walls = []
-        # self.lives = 3
         self.sounds = Sounds()
         self.ghost_sprites = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.obstacles = pygame.sprite.Group()
-        self.start_pos = []
-
-        # self.player_lives = 3
+        self.start_pos = [0, 0]
+        self.score = 0
+        self.lives = 3
 
     def draw_start_menu(self):
         if self.state == State.START:
@@ -277,39 +276,35 @@ class GameController:
 
     def add_dot(self, dot):
         self.dots.append(dot)
+
     def add_power_dot(self, dot):
         self.power_dots.append(dot)
+
     def add_wall(self, wall):
         self.walls.append(wall)
 
     def create_map_objects(self):
-        for i in range(len(self.level)):
-            for j in range(len(self.level[i])):
-                if self.level[i][j] == 1:
-                    self.add_dot(
-                        Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
-                if self.level[i][j] == 2:
-                    self.add_power_dot(
-                        Power_Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 5)))
-                if self.level[i][j] == 3:
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] == 3:
                     self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT))
-                if self.level[i][j] == 4:
+                if self.board[i][j] == 4:
                     self.add_wall(Tile((j * TILE_WIDTH), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH, 3))
-                if self.level[i][j] == 5:
+                if self.board[i][j] == 5:
                     self.add_wall(
                         Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
                              3))
                     self.add_wall(
                         Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
                              TILE_HEIGHT * 0.7))
-                if self.level[i][j] == 6:
+                if self.board[i][j] == 6:
                     self.add_wall(
                         Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3,
                              TILE_HEIGHT * 0.5))
                     self.add_wall(
                         Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
                              TILE_HEIGHT * 0.7, 3))
-                if self.level[i][j] == 7:
+                if self.board[i][j] == 7:
                     pygame.draw.arc(self.screen, BLUE,
                                     [(j * TILE_HEIGHT + (TILE_HEIGHT * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
                                      TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
@@ -318,65 +313,62 @@ class GameController:
                     self.add_wall(
                         Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5),
                              TILE_WIDTH * 0.6, 3))
-                if self.level[i][j] == 8:
+                if self.board[i][j] == 8:
                     self.add_wall(
                         Tile((j * TILE_WIDTH - 1.5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 1.5), TILE_WIDTH * 0.6,
                              3))
                     self.add_wall(Tile((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 1.5), (i * TILE_HEIGHT), 3, TILE_HEIGHT *
                                        0.6))
-                if self.level[i][j] == 9:
+                if self.board[i][j] == 9:
                     pass
 
 
     def draw_board(self):
-        for i in range(len(self.level)):
-            for j in range(len(self.level[i])):
-                #if self.level[i][j] == 2:
-                    #pygame.draw.circle(self.screen, WHITE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT +
-                                                        #    (0.5 * TILE_HEIGHT)), 10)
-                if self.level[i][j] == 3:
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] == 3:
                     pygame.draw.line(self.screen, RED, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
                                      (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 3)
-                if self.level[i][j] == 4:
+                if self.board[i][j] == 4:
                     pygame.draw.line(self.screen, RED, (j * TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
                                      (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
-                if self.level[i][j] == 5:
+                if self.board[i][j] == 5:
                     pygame.draw.arc(self.screen, RED, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT +
                                                         (0.5 * TILE_HEIGHT)), TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 3)
-                if self.level[i][j] == 6:
+                if self.board[i][j] == 6:
                     pygame.draw.arc(self.screen, RED, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT +
                                                         (0.5 * TILE_HEIGHT)), TILE_WIDTH, TILE_HEIGHT], PI / 2, PI, 3)
-                if self.level[i][j] == 7:
+                if self.board[i][j] == 7:
                     pygame.draw.arc(self.screen, RED,
                                     [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
                                      TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 3)
-                if self.level[i][j] == 8:
+                if self.board[i][j] == 8:
                     pygame.draw.arc(self.screen, RED,
                                     [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
                                      TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 3)
-                if self.level[i][j] == 9:
+                if self.board[i][j] == 9:
                     pygame.draw.line(self.screen, WHITE, (j * TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
                                      (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 3)
                 # So the 'COHORT' is a different color (BLUE)
-                if self.level[i][j] == 10:
+                if self.board[i][j] == 10:
                     pygame.draw.line(self.screen, BLUE, (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT),
                                  (j * TILE_WIDTH + (0.5 * TILE_WIDTH), i * TILE_HEIGHT + TILE_HEIGHT), 5)
-                if self.level[i][j] == 11:
+                if self.board[i][j] == 11:
                     pygame.draw.line(self.screen, BLUE, (j * TILE_HEIGHT, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)),
                                  (j * TILE_WIDTH + TILE_WIDTH, i * TILE_HEIGHT + (0.5 * TILE_HEIGHT)), 5)
-                if self.level[i][j] == 12:
+                if self.board[i][j] == 12:
                     pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT +
                                                                                                 (0.5 * TILE_HEIGHT)),
                                                     TILE_WIDTH, TILE_HEIGHT], 0, PI / 2, 5)
-                if self.level[i][j] == 13:
+                if self.board[i][j] == 13:
                     pygame.draw.arc(self.screen, BLUE, [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT +
                                                                                             (0.5 * TILE_HEIGHT)),
                                                     TILE_WIDTH, TILE_HEIGHT], PI / 2, PI, 5)
-                if self.level[i][j] == 14:
+                if self.board[i][j] == 14:
                     pygame.draw.arc(self.screen, BLUE,
                                 [(j * TILE_WIDTH + (TILE_WIDTH * 0.5)), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
                                  TILE_WIDTH, TILE_HEIGHT], PI, 3 * PI / 2, 5)
-                if self.level[i][j] == 15:
+                if self.board[i][j] == 15:
                     pygame.draw.arc(self.screen, BLUE,
                                 [(j * TILE_WIDTH - (TILE_WIDTH * 0.4) - 2), (i * TILE_HEIGHT - (0.4 * TILE_HEIGHT)),
                                  TILE_WIDTH, TILE_HEIGHT], 3 * PI / 2, 2 * PI, 5)
@@ -387,21 +379,21 @@ class GameController:
         self.all_sprites.add(self.player)
 
     def lose_life(self):
-        if self.player.lives == 1:
+        if self.lives == 1:
             self.state = State.GAMEOVER
         else:
-            self.player.lives -= 1
+            self.lives -= 1
             self.restart_level()
 
     def draw_lives(self):
         i = PACMAN_SIZE / 2
-        for _ in range(self.player.lives):
+        for _ in range(self.lives):
             self.screen.blit(pygame.transform.scale(pygame.image.load('images/1.png'), (PACMAN_SIZE, PACMAN_SIZE)),
                              (i + PACMAN_SIZE // 2, SCREEN_HEIGHT - 1.5 * PACMAN_SIZE))
             i += PACMAN_SIZE * 2
 
     def create_sprite_objects(self):
-        for row, tiles in enumerate(self.level):
+        for row, tiles in enumerate(self.board):
             for col, tile in enumerate(tiles):
                 if tile in [3, 4, 5, 6, 7, 8, 9]:
                     obstacle = Obstacle(col, row)
@@ -415,12 +407,16 @@ class GameController:
             #for ghost in self.ghosts:
                 #self.ghost_sprites.add(ghost)
                 #self.all_sprites.add(ghost)
+
     def create_dots(self):
-        for i in range(len(self.level)):
-            for j in range(len(self.level[i])):
-                if self.level[i][j] == 1:
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] == 1:
                     self.add_dot(
                         Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 2), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 2)))
+                if self.board[i][j] == 2:
+                    self.add_power_dot(
+                        Power_Dot((j * TILE_WIDTH + (0.5 * TILE_WIDTH) - 5), (i * TILE_HEIGHT + (0.5 * TILE_HEIGHT) - 5)))
     def main(self):
         if os.path.exists(HIGH_SCORE_FILE):
             with open(HIGH_SCORE_FILE, 'r') as f:
@@ -436,7 +432,7 @@ class GameController:
 
         while self.running:
 
-            #self.player.packman_img_cycle = self.player.packman_img_cycle + 1 if self.player.packman_img_cycle < 11 else 0
+            self.player.packman_img_cycle = self.player.packman_img_cycle + 1 if self.player.packman_img_cycle < 11 else 0
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -449,22 +445,21 @@ class GameController:
                 game.draw_start_menu()
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE]:
-
                     game.state = State.PREGAME
-
                     play_pacman_intro()  # self.sounds.play_intro()
 
             if game.state == State.PREGAME:
                 self.screen.blit(self.surface, (0, 0))
-                self.draw_board()
-                self.create_sprite_objects()
+
                 if self.start_level:
+                    self.create_sprite_objects()
                     self.create_map_objects()
                     self.create_dots()
                     self.start_level = False
+                self.draw_board()
                 for ghoste in self.ghosts:
                     ghoste.draw(self.screen)
-                    #self.player.draw(self.screen)
+
                 for dot in self.dots:
                     dot.draw(self.screen)
                 for power_dot in self.power_dots:
@@ -494,18 +489,32 @@ class GameController:
                         pygame.display.flip()
                         self.clock.tick(FRAME_RATE)
                 game.state = State.GAME
+
             if game.state == State.GAME:
                 dt = self.clock.tick(FRAME_RATE) / 1000
                 self.screen.blit(self.surface, (0, 0))
+
+                if self.start_level:
+                    if self.level == 2:
+                        self.board = boards3
+                    self.create_sprite_objects()
+                    self.create_dots()
+                    self.start_level = False
+
+                for dot in self.dots:
+                    dot.draw(self.screen)
+                for power_dot in self.power_dots:
+                    power_dot.draw(self.screen)
 
                 self.player.update(dt, self.obstacles)
                 for sprite in self.all_sprites:
                     self.screen.blit(sprite.image, sprite.rect)
                 self.draw_board()
-                # self.player.handle_keys()
+
                 for ghost in self.ghosts:
                     if ghost.dead_timer == 0:
                         ghost.update(self.walls, self.ghosts)
+
                 for power_dot in self.power_dots:
                     if self.player.rect.colliderect(power_dot.rect):   
                         self.power_dots.remove(power_dot) 
@@ -519,13 +528,13 @@ class GameController:
                     if self.player.rect.colliderect(dot.rect):
                         self.dots.remove(dot)
                         self.sounds.play_pacman_eating()  # Play eating sound
-                        self.player.score += 1  # Increase the score when a dot is eaten
-                        if self.player.score > high_score:
-                            high_score = self.player.score
-                        if self.player.score >= 20 and self.player.score % 20 == 0:
-                            self.player.lives += 1
-
+                        self.score += 1  # Increase the score when a dot is eaten
+                        if self.score > high_score:
+                            high_score = self.score
+                        if self.score >= 20 and self.score % 20 == 0:
+                            self.lives += 1
                             self.sounds.play_extra_life()
+
                 for ghost in self.ghosts:
                     if ghost.dead_timer>0:
                         ghost.dead_timer-=1
@@ -539,19 +548,21 @@ class GameController:
                 #for tile in self.walls:
                     #tile.draw(self.screen)
                 for ghost in self.ghosts:
-
                     if ghost.dead_timer==0:
                         ghost.draw(self.screen)
-                #self.player.draw(self.screen)
 
-                for dot in self.dots:
-                    dot.draw(self.screen)
-                for power_dot in self.power_dots:
-                    power_dot.draw(self.screen)
                 game.draw_lives()
 
                 if not self.dots:
-                    game.state = State.WIN
+                    if self.level == 2:
+                        self.state = State.WIN
+                    elif self.level == 1:
+                        for sprite in self.all_sprites:
+                            sprite.kill()
+                        self.dots.clear()
+                        self.power_dots.clear()
+                        self.level += 1
+                        self.start_level = True
 
                     
                 score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
@@ -582,7 +593,11 @@ class GameController:
                     self.player = Player(100, 200)
                     self.walls.clear()
                     self.dots.clear()
+                    self.power_dots.clear()
                     self.start_level = True
+                    self.lives = 3
+                    self.level = 1
+                    self.score = 0
                     self.state = State.START
                 if key[pygame.K_q]:
                     self.running = False
