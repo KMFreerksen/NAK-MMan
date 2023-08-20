@@ -74,6 +74,10 @@ class Ghost(pygame.sprite.Sprite):
                 self.new_rect.move_ip(GHOST_SPEED, 0)
             if (not any(wall.rect.colliderect(self.new_rect) for wall in obstacles)) and self.direction != \
                     self.previous_move[0]:
+                if self.new_rect.x <= 0:
+                    self.new_rect.move_ip(SCREEN_WIDTH, 0)
+                if self.new_rect.x >= SCREEN_WIDTH:
+                    self.new_rect.move_ip(-SCREEN_WIDTH, 0)
                 self.rect = self.new_rect
 
                 flag = 0
