@@ -26,6 +26,7 @@ PI = math.pi
 FRAME_RATE = 30
 PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
+GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'jason.jpg', 'dawn.jpg']
 MAX_LEVEL = 2
 
 CHANGE_DIRECTION_EVENT = pygame.USEREVENT + 1
@@ -222,7 +223,7 @@ class GameController:
         self.player = Player(100, 120)
         self.dots = []
         self.power_dots = []
-        self.ghosts = [Ghost(330, 330 , 'Nick.jpg'),Ghost(330, 330 , 'Felipe.jpg'),Ghost(330, 330 , 'Jason.jpg'),Ghost(330, 330 , 'Dawn.jpg')]
+        self.ghosts = []
         self.walls = []
         self.sounds = Sounds()
         self.ghost_sprites = pygame.sprite.Group()
@@ -393,6 +394,7 @@ class GameController:
             i += PACMAN_SIZE * 2
 
     def create_sprite_objects(self):
+        ghost_loc = []
         for row, tiles in enumerate(self.board):
             for col, tile in enumerate(tiles):
                 if tile in [3, 4, 5, 6, 7, 8, 9]:
@@ -404,9 +406,13 @@ class GameController:
                     self.all_sprites.add(self.player)
                     self.start_pos.append(col)
                     self.start_pos.append(row)
-            #for ghost in self.ghosts:
-                #self.ghost_sprites.add(ghost)
-                #self.all_sprites.add(ghost)
+                elif tile == 'G':
+                    ghost_loc.append((col * TILE_SIZE, row * TILE_SIZE))
+        i = 0
+        for loc in ghost_loc:
+            ghost = Ghost(loc[0], loc[1], GHOST_IMGS[i])
+            self.ghosts.append(ghost)
+            i += 1
 
     def create_dots(self):
         for i in range(len(self.board)):
@@ -471,20 +477,12 @@ class GameController:
                     for i in range(11):
                         self.screen.blit(self.surface, (0, 0))
                         self.draw_board()
-                        if self.start_level:
-                            self.create_sprite_objects()
-                            self.create_map_objects()
-                            self.start_level = False
                         for ghoste in self.ghosts:
                             ghoste.draw(self.screen)
                         for dot in self.dots:
                             dot.draw(self.screen)
-
-                        #score_text = SCORE_FONT.render("Score: %d" % self.player.score, True, (255, 255, 255))
-                        #self.screen.blit(score_text, (10, 10))
-                        #high_score_text = SCORE_FONT.render("High Score: %d" % high_score, True, (255, 255, 255))
-                        #self.screen.blit(high_score_text, (SCREEN_WIDTH - 200, 10))
-
+                        for power_dot in self.power_dots:
+                            power_dot.draw(self.screen)
                         ghost.rect.move_ip(0,-5)
                         pygame.display.flip()
                         self.clock.tick(FRAME_RATE)
