@@ -26,6 +26,7 @@ PI = math.pi
 FRAME_RATE = 30
 #PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
+GHOST_SPEED = 5
 GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'jason.jpg', 'dawn.jpg']
 MAX_LEVEL = 2
 
@@ -66,13 +67,13 @@ class Ghost(pygame.sprite.Sprite):
         while flag:
             self.new_rect = self.rect.copy()
             if self.direction == 'up':
-                self.new_rect.move_ip(0, -5)
+                self.new_rect.move_ip(0, -GHOST_SPEED)
             elif self.direction == 'down':
-                self.new_rect.move_ip(0, 5)
+                self.new_rect.move_ip(0, GHOST_SPEED)
             elif self.direction == 'left':
-                self.new_rect.move_ip(-5, 0)
+                self.new_rect.move_ip(-GHOST_SPEED, 0)
             elif self.direction == 'right':
-                self.new_rect.move_ip(5, 0)
+                self.new_rect.move_ip(GHOST_SPEED, 0)
             if (not any(wall.rect.colliderect(self.new_rect) for wall in obstacles)) and self.direction != self.previous_move[0]:
                 self.rect = self.new_rect
 
@@ -84,7 +85,7 @@ class Ghost(pygame.sprite.Sprite):
                 self.direction = random.choice(['up', 'down', 'left', 'right'])
 
     def out(self, screen):
-        self.clock=pygame.time.Clock()
+        self.clock = pygame.time.Clock()
         
     def die(self):
         self.x = self.spawn_pos[0]
