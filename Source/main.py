@@ -25,7 +25,7 @@ FRAME_RATE = 30
 PACKMAN_IMG_CYCLE = 0
 PLAYER_SPEED = 10 * TILE_SIZE
 GHOST_SPEED = 5
-GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'jason.jpg', 'dawn.jpg']
+GHOST_IMGS = ['Nick.jpg', 'Felipe.jpg', 'Jason.jpg', 'Dawn.jpg']
 MAX_LEVEL = 2
 
 CHANGE_DIRECTION_EVENT = pygame.USEREVENT + 1
