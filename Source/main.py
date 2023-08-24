@@ -42,12 +42,12 @@ class State(Enum):
     PREGAME = 4
     WIN = 5
 
-
 class Ghost(pygame.sprite.Sprite):
 
     def __init__(self, x, y, color):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load(f'images/ghost_{color}'), (TILE_SIZE, TILE_SIZE))
+        self.image_fr = pygame.transform.scale(pygame.image.load(f'images/freight_{color}'), (TILE_SIZE, TILE_SIZE))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.direction = random.choice(['up', 'down', 'left', 'right'])
         self.new_rect = self.rect
@@ -57,8 +57,11 @@ class Ghost(pygame.sprite.Sprite):
         self.x = 0
         self.y = 0
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+    def draw(self, screen, mode):
+        if not mode:
+            screen.blit(self.image, self.rect)
+        else:
+            screen.blit(self.image_fr, self.rect)
 
     def update(self, obstacles, ghosts):
         flag = 1
@@ -148,7 +151,6 @@ class Player(pygame.sprite.Sprite):
 
         if now - self.last_update > self.move_buffer:
             self.last_update = now
-
             new_dir_vec = vec(0, 0)
             if self.dirvec.y == 0:
                 if key[pygame.K_LEFT]:  # left key
@@ -431,7 +433,7 @@ class GameController:
                     self.start_level = False
                 self.draw_board()
                 for ghoste in self.ghosts:
-                    ghoste.draw(self.screen)
+                    ghoste.draw(self.screen, False)
 
                 for dot in self.dots:
                     dot.draw(self.screen)
@@ -446,7 +448,7 @@ class GameController:
                         self.screen.blit(self.surface, (0, 0))
                         self.draw_board()
                         for ghoste in self.ghosts:
-                            ghoste.draw(self.screen)
+                            ghoste.draw(self.screen, False)
                         for dot in self.dots:
                             dot.draw(self.screen)
                         for power_dot in self.power_dots:
@@ -513,7 +515,7 @@ class GameController:
 
                 for ghost in self.ghosts:
                     if ghost.dead_timer == 0:
-                        ghost.draw(self.screen)
+                        ghost.draw(self.screen, frightened_mode)
                 game.draw_lives()
 
                 if not self.dots:
